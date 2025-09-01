@@ -1,0 +1,7 @@
+<h2>Admin Dashboard</h2>
+<div *ngIf="user?.roles.includes('super_admin')">
+  <button (click)="promoteUser()">Promote User</button>
+</div>
+<div *ngIf="user?.roles.includes('group_admin')">
+  <button (click)="createGroup()">Create Group</button>
+</div>

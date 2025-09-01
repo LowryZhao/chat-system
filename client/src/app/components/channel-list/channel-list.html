@@ -1,0 +1,6 @@
+<h2>Channels</h2>
+<ul>
+  <li *ngFor="let channel of channels">
+    {{ channel.name }} <button (click)="joinChannel(channel.id)">Join</button>
+  </li>
+</ul>

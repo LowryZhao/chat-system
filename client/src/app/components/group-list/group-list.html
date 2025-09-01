@@ -1,0 +1,6 @@
+<h2>My Groups</h2>
+<ul>
+  <li *ngFor="let group of groups">
+    {{ group.name }} <button (click)="joinGroup(group.id)">Join</button>
+  </li>
+</ul>
