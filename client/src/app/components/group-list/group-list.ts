@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { GroupService } from '../../services/group';
 import { Group } from '../../models/group.model';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-group-list',
@@ -9,16 +10,57 @@ import { Group } from '../../models/group.model';
 })
 export class GroupListComponent implements OnInit {
   groups: Group[] = [];
+  newGroupName: string = '';
 
-  constructor(private groupService: GroupService) {}
+  constructor(
+    private groupService: GroupService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
-    this.groups = this.groupService.getGroups(); // 初始加载本地数据
+    this.loadGroups();
+  }
+
+  loadGroups() {
+    const userId = this.authService.getUser().id;
+    this.groupService.getUserGroups(userId).subscribe(
+      (groups) => {
+        this.groups = groups;
+        this.groupService.saveGroups(groups);
+      }
+    );
+  }
+
+  createGroup() {
+    if (this.newGroupName && this.authService.hasRole('group_admin')) {
+      const userId = this.authService.getUser().id;
+      this.groupService.createGroup(this.newGroupName, userId).subscribe(
+        (group) => {
+          this.newGroupName = '';
+          this.loadGroups();
+        },
+        (error) => console.error('Error creating group:', error)
+      );
+    }
   }
 
   joinGroup(groupId: string) {
-    this.groupService.joinGroup(groupId, 'userId').subscribe(
-      (group) => console.log('Joined group:', group)
+    const userId = this.authService.getUser().id;
+    this.groupService.joinGroup(groupId, userId).subscribe(
+      (group) => {
+        this.loadGroups();
+      },
+      (error) => console.error('Error joining group:', error)
+    );
+  }
+
+  leaveGroup(groupId: string) {
+    const userId = this.authService.getUser().id;
+    this.groupService.leaveGroup(groupId, userId).subscribe(
+      () => {
+        this.loadGroups();
+      },
+      (error) => console.error('Error leaving group:', error)
     );
   }
 }
