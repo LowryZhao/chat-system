@@ -1,12 +1,18 @@
-<form (ngSubmit)="onLogin()" #loginForm="ngForm">
+<form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+  <h2>{{ isRegister ? 'Register' : 'Login' }}</h2>
   <div>
     <label for="username">Username:</label>
     <input id="username" name="username" [(ngModel)]="username" required>
+  </div>
+  <div *ngIf="isRegister">
+    <label for="email">Email:</label>
+    <input id="email" name="email" type="email" [(ngModel)]="email" required>
   </div>
   <div>
     <label for="password">Password:</label>
     <input id="password" type="password" name="password" [(ngModel)]="password" required>
   </div>
-  <button type="submit" [disabled]="!loginForm.valid">Login</button>
+  <button type="submit" [disabled]="!loginForm.valid">Submit</button>
+  <button type="button" (click)="toggleMode()">{{ isRegister ? 'Switch to Login' : 'Switch to Register' }}</button>
   <div *ngIf="error" style="color: red">{{ error }}</div>
 </form>

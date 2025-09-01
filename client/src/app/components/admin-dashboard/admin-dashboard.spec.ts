@@ -1,23 +1,32 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../../services/auth';
+import { GroupService } from '../../services/group';
 
-import { AdminDashboard } from './admin-dashboard';
+@Component({
+  selector: 'app-admin-dashboard',
+  templateUrl: './admin-dashboard.component.html',
+  styleUrls: ['./admin-dashboard.component.css']
+})
+export class AdminDashboardComponent implements OnInit {
+  user: any;
 
-describe('AdminDashboard', () => {
-  let component: AdminDashboard;
-  let fixture: ComponentFixture<AdminDashboard>;
+  constructor(private authService: AuthService, private groupService: GroupService) {}
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [AdminDashboard]
-    })
-    .compileComponents();
+  ngOnInit() {
+    this.user = this.authService.getUser();
+  }
 
-    fixture = TestBed.createComponent(AdminDashboard);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+  promoteUser() {
+    if (this.authService.hasRole('super_admin')) {
+      console.log('Promote user logic here');
+    }
+  }
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+  createGroup() {
+    if (this.authService.hasRole('group_admin') || this.authService.hasRole('super_admin')) {
+      this.groupService.createGroup('New Group', this.user.id).subscribe(
+        (group) => console.log('Created group:', group)
+      );
+    }
+  }
+}

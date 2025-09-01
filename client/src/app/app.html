@@ -2,7 +2,7 @@
 <nav>
   <a routerLink="/groups" routerLinkActive="active" *ngIf="isAuthenticated()">Groups</a>
   <a routerLink="/channels" routerLinkActive="active" *ngIf="isAuthenticated()">Channels</a>
-  <a routerLink="/admin" routerLinkActive="active" *ngIf="isAdmin()">Admin</a>
+  <a routerLink="/admin" routerLinkActive="active" *ngIf="hasRole('super_admin')">Admin</a>
   <a routerLink="/profile" routerLinkActive="active" *ngIf="isAuthenticated()">Profile</a>
   <a routerLink="/login" routerLinkActive="active" *ngIf="!isAuthenticated()">Login</a>
 </nav>

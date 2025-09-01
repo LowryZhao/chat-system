@@ -7,14 +7,13 @@ import { AuthService } from './services/auth';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  constructor(private authService: AuthService) {}
+  constructor(public authService: AuthService) {}
 
   isAuthenticated(): boolean {
-    return !!this.authService.getUser().username;
+    return this.authService.isAuthenticated();
   }
 
-  isAdmin(): boolean {
-    const user = this.authService.getUser();
-    return user.roles && (user.roles.includes('super_admin') || user.roles.includes('group_admin'));
+  hasRole(role: string): boolean {
+    return this.authService.hasRole(role);
   }
 }
