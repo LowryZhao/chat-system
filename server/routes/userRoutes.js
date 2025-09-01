@@ -1,15 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { users } = require('../models/data');
+const { login, register } = require('../controllers/userController');
 
-router.post('/login', (req, res) => {
-  const { username, password } = req.body;
-  const user = users.find(u => u.username === username && u.password === password);
-  if (user) {
-    res.json(user);
-  } else {
-    res.status(401).json({ error: 'Invalid credentials' });
-  }
-});
+router.post('/login', login);
+router.post('/register', register);
 
 module.exports = router;
