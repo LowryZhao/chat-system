@@ -1,7 +1,7 @@
 <h2>My Groups</h2>
 <div *ngIf="authService.hasRole('group_admin')">
   <input [(ngModel)]="newGroupName" placeholder="New Group Name">
-  <button (click)="createGroup()">Create Group</button>
+  <button (click)="createGroup()" [disabled]="!newGroupName">Create Group</button>
 </div>
 <ul>
   <li *ngFor="let group of groups">

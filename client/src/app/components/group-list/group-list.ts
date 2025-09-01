@@ -23,44 +23,45 @@ export class GroupListComponent implements OnInit {
 
   loadGroups() {
     const userId = this.authService.getUser().id;
-    this.groupService.getUserGroups(userId).subscribe(
-      (groups) => {
+    this.groupService.getUserGroups(userId).subscribe({
+      next: (groups) => {
         this.groups = groups;
         this.groupService.saveGroups(groups);
-      }
-    );
+      },
+      error: (error) => console.error('Error loading groups:', error)
+    });
   }
 
   createGroup() {
     if (this.newGroupName && this.authService.hasRole('group_admin')) {
       const userId = this.authService.getUser().id;
-      this.groupService.createGroup(this.newGroupName, userId).subscribe(
-        (group) => {
+      this.groupService.createGroup(this.newGroupName, userId).subscribe({
+        next: (group) => {
           this.newGroupName = '';
           this.loadGroups();
         },
-        (error) => console.error('Error creating group:', error)
-      );
+        error: (error) => console.error('Error creating group:', error)
+      });
     }
   }
 
   joinGroup(groupId: string) {
     const userId = this.authService.getUser().id;
-    this.groupService.joinGroup(groupId, userId).subscribe(
-      (group) => {
+    this.groupService.joinGroup(groupId, userId).subscribe({
+      next: (group) => {
         this.loadGroups();
       },
-      (error) => console.error('Error joining group:', error)
-    );
+      error: (error) => console.error('Error joining group:', error)
+    });
   }
 
   leaveGroup(groupId: string) {
     const userId = this.authService.getUser().id;
-    this.groupService.leaveGroup(groupId, userId).subscribe(
-      () => {
+    this.groupService.leaveGroup(groupId, userId).subscribe({
+      next: () => {
         this.loadGroups();
       },
-      (error) => console.error('Error leaving group:', error)
-    );
+      error: (error) => console.error('Error leaving group:', error)
+    });
   }
 }

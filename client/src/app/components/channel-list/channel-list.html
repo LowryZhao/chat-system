@@ -1,7 +1,7 @@
 <h2>Channels</h2>
 <div *ngIf="authService.hasRole('group_admin')">
   <input [(ngModel)]="newChannelName" placeholder="New Channel Name">
-  <button (click)="createChannel()">Create Channel</button>
+  <button (click)="createChannel()" [disabled]="!newChannelName || !selectedGroupId">Create Channel</button>
 </div>
 <ul>
   <li *ngFor="let channel of channels">

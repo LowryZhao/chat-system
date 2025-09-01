@@ -27,46 +27,52 @@ export class ChannelListComponent implements OnInit {
   loadChannels() {
     const user = this.authService.getUser();
     if (user.groups.length > 0) {
-      this.channelService.getGroupChannels(user.groups[0]).subscribe(
-        (channels) => {
+      this.selectedGroupId = user.groups[0];
+      this.channelService.getGroupChannels(this.selectedGroupId).subscribe({
+        next: (channels) => {
           this.channels = channels;
           this.channelService.saveChannels(channels);
-        }
-      );
+        },
+        error: (error) => console.error('Error loading channels:', error)
+      });
     }
   }
 
   createChannel() {
     if (this.newChannelName && this.authService.hasRole('group_admin')) {
       const userId = this.authService.getUser().id;
-      const groupId = this.selectedGroupId || this.authService.getUser().groups[0];
-      this.channelService.createChannel(this.newChannelName, groupId, userId).subscribe(
-        (channel) => {
-          this.newChannelName = '';
-          this.loadChannels();
-        },
-        (error) => console.error('Error creating channel:', error)
-      );
+      if (!this.selectedGroupId && this.authService.getUser().groups.length > 0) {
+        this.selectedGroupId = this.authService.getUser().groups[0];
+      }
+      if (this.selectedGroupId) {
+        this.channelService.createChannel(this.newChannelName, this.selectedGroupId, userId).subscribe({
+          next: (channel) => {
+            this.newChannelName = '';
+            this.loadChannels();
+          },
+          error: (error) => console.error('Error creating channel:', error)
+        });
+      }
     }
   }
 
   joinChannel(channelId: string) {
     const userId = this.authService.getUser().id;
-    this.channelService.joinChannel(channelId, userId).subscribe(
-      (channel) => {
+    this.channelService.joinChannel(channelId, userId).subscribe({
+      next: (channel) => {
         this.loadChannels();
       },
-      (error) => console.error('Error joining channel:', error)
-    );
+      error: (error) => console.error('Error joining channel:', error)
+    });
   }
 
   leaveChannel(channelId: string) {
     const userId = this.authService.getUser().id;
-    this.channelService.leaveChannel(channelId, userId).subscribe(
-      () => {
+    this.channelService.leaveChannel(channelId, userId).subscribe({
+      next: () => {
         this.loadChannels();
       },
-      (error) => console.error('Error leaving channel:', error)
-    );
+      error: (error) => console.error('Error leaving channel:', error)
+    });
   }
 }
