@@ -1,11 +1,15 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  templateUrl: './login.html',
+  styleUrls: ['./login.css'],
+  standalone: true,
+  imports: [CommonModule, FormsModule]
 })
 export class LoginComponent {
   username: string = '';
@@ -25,28 +29,28 @@ export class LoginComponent {
   }
 
   login() {
-    this.authService.login(this.username, this.password).subscribe({
-      next: (user) => {
+    this.authService.login(this.username, this.password).subscribe(
+      (user) => {
         this.authService.saveUser(user);
         this.router.navigate(['/groups']);
       },
-      error: () => {
+      (error) => {
         this.error = 'Invalid credentials';
       }
-    });
+    );
   }
 
   register() {
-    this.authService.register(this.username, this.email, this.password).subscribe({
-      next: (user) => {
+    this.authService.register(this.username, this.email, this.password).subscribe(
+      (user) => {
         this.authService.saveUser(user);
         this.isRegister = false;
         this.error = 'Registration successful, please login';
       },
-      error: (error) => {
+      (error) => {
         this.error = error.error?.error || 'Registration failed';
       }
-    });
+    );
   }
 
   toggleMode() {

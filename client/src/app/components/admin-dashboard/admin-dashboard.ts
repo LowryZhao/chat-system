@@ -1,28 +1,25 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth';
 import { GroupService } from '../../services/group';
 
 @Component({
   selector: 'app-admin-dashboard',
-  templateUrl: './admin-dashboard.component.html',
-  styleUrls: ['./admin-dashboard.component.css']
+  templateUrl: './admin-dashboard.html',
+  styleUrls: ['./admin-dashboard.css'],
+  standalone: true,
+  imports: [CommonModule]
 })
 export class AdminDashboardComponent implements OnInit {
-  user: any;
+  constructor(public authService: AuthService, private groupService: GroupService) {}
 
-  constructor(private authService: AuthService, private groupService: GroupService) {}
-
-  ngOnInit() {
-    this.user = this.authService.getUser();
-  }
+  ngOnInit() {}
 
   promoteUser() {
-    console.log('Promote user logic here');
+    console.log('Promote User');
   }
 
   createGroup() {
-    this.groupService.createGroup('New Group', this.user.id).subscribe(
-      (group) => console.log('Created group:', group)
-    );
+    console.log('Create Group');
   }
 }

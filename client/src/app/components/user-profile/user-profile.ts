@@ -1,28 +1,28 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth';
-import { GroupService } from '../../services/group';
 
 @Component({
   selector: 'app-user-profile',
-  templateUrl: './user-profile.component.html',
-  styleUrls: ['./user-profile.component.css']
+  templateUrl: './user-profile.html',
+  styleUrls: ['./user-profile.css'],
+  standalone: true,
+  imports: [CommonModule]
 })
 export class UserProfileComponent implements OnInit {
-  user: any;
+  constructor(public authService: AuthService) {}
 
-  constructor(private authService: AuthService, private groupService: GroupService) {}
+  ngOnInit() {}
 
-  ngOnInit() {
-    this.user = this.authService.getUser();
+  get user() {
+    return this.authService.getUser();
   }
 
   leaveGroup() {
-    this.groupService.leaveGroup('groupId', this.user.id).subscribe(
-      () => console.log('Left group')
-    );
+    console.log('Leave Group');
   }
 
   deleteAccount() {
-    console.log('Delete account logic here');
+    console.log('Delete Account');
   }
 }
