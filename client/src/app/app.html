@@ -1,9 +1,10 @@
 <h1>Chat System</h1>
 <nav>
-  <a routerLink="/groups" routerLinkActive="active" *ngIf="isAuthenticated()">Groups</a>
-  <a routerLink="/channels" routerLinkActive="active" *ngIf="isAuthenticated()">Channels</a>
-  <a routerLink="/admin" routerLinkActive="active" *ngIf="hasRole('super_admin')">Admin</a>
-  <a routerLink="/profile" routerLinkActive="active" *ngIf="isAuthenticated()">Profile</a>
-  <a routerLink="/login" routerLinkActive="active" *ngIf="!isAuthenticated()">Login</a>
+  <a routerLink="/groups">Groups</a>
+  <a routerLink="/channels">Channels</a>
+  <a routerLink="/profile">Profile</a>
+  <a *ngIf="auth.hasRole('super_admin') || auth.hasRole('group_admin')" routerLink="/admin">Admin</a>
+  <button (click)="logout()">Logout</button>
 </nav>
+
 <router-outlet></router-outlet>

@@ -43,12 +43,16 @@ export class LoginComponent {
   }
 
   register() {
-    this.error = null;
-    this.authService.register(this.username, this.email, this.password).subscribe(
-      () => this.router.navigate(['/groups']),
-      (err) => this.error = 'Registration failed. Please try again.'
-    );
-  }
+  this.error = null;
+  this.authService.register(this.username, this.email, this.password).subscribe(
+    () => {
+      this.isRegister = false;
+      this.error = 'Registration successful, please login';
+      this.password = '';
+    },
+    () => this.error = 'Registration failed. Please try again.'
+  );
+}
 
   toggleMode() {
     this.isRegister = !this.isRegister;

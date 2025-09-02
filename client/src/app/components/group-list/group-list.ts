@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { GroupService } from '../../services/group';
+import { GroupService, Group } from '../../services/group';
 import { AuthService } from '../../services/auth';
 
 @Component({
@@ -12,41 +12,38 @@ import { AuthService } from '../../services/auth';
   imports: [CommonModule, FormsModule]
 })
 export class GroupListComponent implements OnInit {
-  groups: any[] = [];
+  myGroups: Group[] = [];
+  allGroups: Group[] = [];
 
-  constructor(public authService: AuthService, private groupService: GroupService) {
-    console.log('AuthService userId:', this.authService.getUser().id);
-  }
+  constructor(
+    public authService: AuthService,
+    private groupService: GroupService
+  ) {}
 
   ngOnInit() {
-    this.loadGroups();
+    this.loadData();
   }
 
-  loadGroups() {
-    const userId = String(this.authService.getUser().id);
-    console.log('Loading groups for userId:', userId, ' (type:', typeof userId, ')');
-    this.groupService.getUserGroups(userId).subscribe(
-      (groups) => {
-        console.log('Received groups:', groups);
-        this.groups = groups;
-      },
-      (error) => console.error('Error loading groups:', error)
-    );
-  }
-
-  joinGroup(groupId: string) {
+  private loadData() {
     const userId = this.authService.getUser().id;
-    this.groupService.joinGroup(groupId, userId).subscribe(
-      () => this.loadGroups(),
-      (error) => console.error('Join failed:', error)
-    );
+
+    this.groupService.getUserGroups(userId).subscribe(gs => this.myGroups = gs);
+    
+    this.groupService.getAllGroups().subscribe(gs => this.allGroups = gs);
   }
 
-  leaveGroup(groupId: string) {
+  join(groupId: string) {
     const userId = this.authService.getUser().id;
-    this.groupService.leaveGroup(groupId, userId).subscribe(
-      () => this.loadGroups(),
-      (error) => console.error('Leave failed:', error)
-    );
+    this.groupService.joinGroup(groupId, userId).subscribe(() => this.loadData());
+  }
+
+  leave(groupId: string) {
+    const userId = this.authService.getUser().id;
+    this.groupService.leaveGroup(groupId, userId).subscribe(() => this.loadData());
+  }
+
+  isMember(group: Group): boolean {
+    const uid = this.authService.getUser().id;
+    return group.members?.includes(uid);
   }
 }

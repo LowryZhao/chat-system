@@ -29,3 +29,9 @@ exports.leaveChannel = (req, res) => {
   if (!channel) return res.status(404).json({ error: 'Channel not found' });
   res.json({ message: 'Left channel successfully' });
 };
+
+exports.getGroupChannels = (req, res) => {
+  const { groupId } = req.params;
+  const list = channels.filter(c => c.groupId === groupId);
+  return res.json(list);
+};

@@ -1,9 +1,19 @@
 <h2>My Groups</h2>
 <ul>
-  <li *ngFor="let group of groups">
-    {{ group.name || 'Unnamed' }}
-    <button *ngIf="!group.members?.includes(authService.getUser().id)" (click)="joinGroup(group.id)">Join</button>
-    <button *ngIf="group.members?.includes(authService.getUser().id)" (click)="leaveGroup(group.id)">Leave</button>
+  <li *ngFor="let g of myGroups">
+    {{ g.name }}
+    <button (click)="leave(g.id)">Leave</button>
   </li>
-  <li *ngIf="groups.length === 0">No groups for user ID: {{ authService.getUser().id }}</li>
+</ul>
+<p *ngIf="myGroups.length === 0">You are not in any groups yet.</p>
+
+<hr />
+
+<h3>Available Groups</h3>
+<ul>
+  <li *ngFor="let g of allGroups">
+    {{ g.name }}
+    <button *ngIf="!isMember(g)" (click)="join(g.id)">Join</button>
+    <span *ngIf="isMember(g)">&nbsp;✓ Joined</span>
+  </li>
 </ul>

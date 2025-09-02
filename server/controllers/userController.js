@@ -3,11 +3,8 @@ const { users } = require('../models/data');
 exports.login = (req, res) => {
   const { username, password } = req.body;
   const user = users.find(u => u.username === username && u.password === password);
-  if (user) {
-    res.json(user);
-  } else {
-    res.status(401).json({ error: 'Invalid credentials' });
-  }
+  if (user) return res.json(user);
+  return res.status(401).json({ error: 'Invalid credentials' });
 };
 
 exports.register = (req, res) => {

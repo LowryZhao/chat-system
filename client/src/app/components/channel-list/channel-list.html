@@ -1,12 +1,13 @@
 <h2>Channels</h2>
-<div *ngIf="authService.hasRole('group_admin')">
-  <input [(ngModel)]="newChannelName" placeholder="New Channel Name">
-  <button (click)="createChannel()" [disabled]="!newChannelName || !selectedGroupId">Create Channel</button>
-</div>
+
+<label>
+  Group:
+  <select [(ngModel)]="selectedGroupId" (change)="onGroupChange()">
+    <option *ngFor="let g of myGroups" [value]="g.id">{{ g.name }}</option>
+  </select>
+</label>
+
 <ul>
-  <li *ngFor="let channel of channels">
-    {{ channel.name }}
-    <button (click)="joinChannel(channel.id)" *ngIf="true">Join</button>
-    <button (click)="leaveChannel(channel.id)" *ngIf="true">Leave</button>
-  </li>
+  <li *ngFor="let c of channels">{{ c.name }}</li>
 </ul>
+<p *ngIf="channels.length === 0">No channels in this group yet.</p>
