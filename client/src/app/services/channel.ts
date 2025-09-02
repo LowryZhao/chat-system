@@ -7,7 +7,7 @@ import { Channel } from '../models/channel.model';
   providedIn: 'root'
 })
 export class ChannelService {
-  private apiUrl = '/api'; 
+  private apiUrl = 'http://localhost:3000/api'; 
 
   constructor(private http: HttpClient) {}
 

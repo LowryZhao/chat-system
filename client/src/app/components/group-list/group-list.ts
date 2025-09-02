@@ -18,12 +18,26 @@ export class GroupListComponent implements OnInit {
   constructor(public authService: AuthService, private groupService: GroupService) {}
 
   ngOnInit() {
+    console.log('GroupListComponent initialized');
     this.loadGroups();
   }
 
   loadGroups() {
-    const userId = this.authService.getUser().id;
-    this.groupService.getUserGroups(userId).subscribe((groups) => (this.groups = groups));
+    const user = this.authService.getUser();
+    if (!user || !user.id) {
+      console.error('No user ID available:', user);
+      return;
+    }
+    console.log('Loading groups for userId:', user.id);
+    this.groupService.getUserGroups(user.id).subscribe(
+      (groups) => {
+        console.log('Groups loaded:', groups);
+        this.groups = groups;
+      },
+      (error) => {
+        console.error('Failed to load groups:', error);
+      }
+    );
   }
 
   createGroup() {
@@ -33,7 +47,8 @@ export class GroupListComponent implements OnInit {
         (group) => {
           this.newGroupName = '';
           this.loadGroups();
-        }
+        },
+        (error) => console.error('Error creating group:', error)
       );
     }
   }
