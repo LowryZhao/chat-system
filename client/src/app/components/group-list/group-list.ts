@@ -13,53 +13,40 @@ import { AuthService } from '../../services/auth';
 })
 export class GroupListComponent implements OnInit {
   groups: any[] = [];
-  newGroupName: string = '';
 
-  constructor(public authService: AuthService, private groupService: GroupService) {}
+  constructor(public authService: AuthService, private groupService: GroupService) {
+    console.log('AuthService userId:', this.authService.getUser().id);
+  }
 
   ngOnInit() {
-    console.log('GroupListComponent initialized');
     this.loadGroups();
   }
 
   loadGroups() {
-    const user = this.authService.getUser();
-    if (!user || !user.id) {
-      console.error('No user ID available:', user);
-      return;
-    }
-    console.log('Loading groups for userId:', user.id);
-    this.groupService.getUserGroups(user.id).subscribe(
+    const userId = String(this.authService.getUser().id);
+    console.log('Loading groups for userId:', userId, ' (type:', typeof userId, ')');
+    this.groupService.getUserGroups(userId).subscribe(
       (groups) => {
-        console.log('Groups loaded:', groups);
+        console.log('Received groups:', groups);
         this.groups = groups;
       },
-      (error) => {
-        console.error('Failed to load groups:', error);
-      }
+      (error) => console.error('Error loading groups:', error)
     );
-  }
-
-  createGroup() {
-    if (this.newGroupName && this.authService.hasRole('group_admin')) {
-      const userId = this.authService.getUser().id;
-      this.groupService.createGroup(this.newGroupName, userId).subscribe(
-        (group) => {
-          this.newGroupName = '';
-          this.loadGroups();
-        },
-        (error) => console.error('Error creating group:', error)
-      );
-    }
   }
 
   joinGroup(groupId: string) {
     const userId = this.authService.getUser().id;
-    this.groupService.joinGroup(groupId, userId).subscribe(() => this.loadGroups());
+    this.groupService.joinGroup(groupId, userId).subscribe(
+      () => this.loadGroups(),
+      (error) => console.error('Join failed:', error)
+    );
   }
 
   leaveGroup(groupId: string) {
     const userId = this.authService.getUser().id;
-    this.groupService.leaveGroup(groupId, userId).subscribe(() => this.loadGroups());
+    this.groupService.leaveGroup(groupId, userId).subscribe(
+      () => this.loadGroups(),
+      (error) => console.error('Leave failed:', error)
+    );
   }
 }

@@ -7,7 +7,6 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-login',
   templateUrl: './login.html',
-  styleUrls: ['./login.css'],
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
@@ -15,8 +14,8 @@ export class LoginComponent {
   username: string = '';
   password: string = '';
   email: string = '';
-  error: string = '';
   isRegister: boolean = false;
+  error: string | null = null;
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -29,32 +28,30 @@ export class LoginComponent {
   }
 
   login() {
+    this.error = null;
+    console.log(`Submitting login: username=${this.username}, password=${this.password}`);
     this.authService.login(this.username, this.password).subscribe(
       (user) => {
-        this.authService.saveUser(user);
-        this.router.navigate(['/groups']);
+        console.log('Login response:', user);
+        if (user) this.router.navigate(['/groups']);
       },
-      (error) => {
-        this.error = 'Invalid credentials';
+      (err) => {
+        console.error('Login error:', err.message);
+        this.error = 'Login failed. Please try again.';
       }
     );
   }
 
   register() {
+    this.error = null;
     this.authService.register(this.username, this.email, this.password).subscribe(
-      (user) => {
-        this.authService.saveUser(user);
-        this.isRegister = false;
-        this.error = 'Registration successful, please login';
-      },
-      (error) => {
-        this.error = error.error?.error || 'Registration failed';
-      }
+      () => this.router.navigate(['/groups']),
+      (err) => this.error = 'Registration failed. Please try again.'
     );
   }
 
   toggleMode() {
     this.isRegister = !this.isRegister;
-    this.error = '';
+    this.error = null;
   }
 }

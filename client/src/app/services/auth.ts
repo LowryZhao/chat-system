@@ -1,42 +1,60 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { User } from '../models/user.model';
+import { Observable, of, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/api';
+  private userKey = 'user';
+  private user: any;
 
-  constructor(private http: HttpClient) {}
-
-  login(username: string, password: string): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/users/login`, { username, password });
+  constructor(private http: HttpClient) {
+    this.loadUser();
   }
 
-  register(username: string, email: string, password: string): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/users/register`, { username, email, password });
+  private loadUser() {
+    const savedUser = localStorage.getItem(this.userKey);
+    this.user = savedUser ? JSON.parse(savedUser) : null;
+    console.log('Loaded user:', this.user);
   }
 
-  saveUser(user: User) {
-    localStorage.setItem('user', JSON.stringify(user));
+  private saveUser(user: any) {
+    this.user = user;
+    localStorage.setItem(this.userKey, JSON.stringify(user));
+    console.log('Saved user:', user);
   }
 
-  getUser(): User {
-    return JSON.parse(localStorage.getItem('user') || '{}');
+  login(username: string, password: string): Observable<any> {
+    console.log(`Login attempt: username=${username}, password=${password}`);
+    const savedUser = this.user || JSON.parse(localStorage.getItem(this.userKey) || '{}');
+    console.log('Saved user data:', savedUser);
+    if (savedUser.username === username && savedUser.password === password) {
+      this.saveUser(savedUser);
+      console.log('Login successful, user:', savedUser);
+      return of(savedUser);
+    }
+    console.log('Login failed, no match found');
+    return of(null).pipe(
+      tap(() => { throw new Error('Invalid credentials'); })
+    );
   }
 
-  isAuthenticated(): boolean {
-    return !!this.getUser().username;
+  register(username: string, email: string, password: string): Observable<any> {
+    const user = { id: Date.now().toString(), username, email, password, roles: ['user'], groups: [] };
+    this.saveUser(user);
+    return of(user);
   }
 
-  hasRole(role: string): boolean {
-    const user = this.getUser();
-    return user.roles && user.roles.includes(role);
+  getUser() {
+    return this.user || { id: '1', username: 'super', password: '123', email: 'super@admin.com', roles: ['super_admin'], groups: [] };
   }
 
-  logout() {
-    localStorage.removeItem('user');
+  isAuthenticated() {
+    return !!this.user;
+  }
+
+  hasRole(role: string) {
+    return this.user?.roles?.includes(role) || false;
   }
 }

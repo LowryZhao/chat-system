@@ -1,12 +1,9 @@
 <h2>My Groups</h2>
-<div *ngIf="authService.hasRole('group_admin')">
-  <input [(ngModel)]="newGroupName" placeholder="New Group Name">
-  <button (click)="createGroup()" [disabled]="!newGroupName">Create Group</button>
-</div>
 <ul>
   <li *ngFor="let group of groups">
-    {{ group.name }}
-    <button (click)="joinGroup(group.id)" *ngIf="!group.members.includes(authService.getUser().id)">Join</button>
-    <button (click)="leaveGroup(group.id)" *ngIf="group.members.includes(authService.getUser().id)">Leave</button>
+    {{ group.name || 'Unnamed' }}
+    <button *ngIf="!group.members?.includes(authService.getUser().id)" (click)="joinGroup(group.id)">Join</button>
+    <button *ngIf="group.members?.includes(authService.getUser().id)" (click)="leaveGroup(group.id)">Leave</button>
   </li>
+  <li *ngIf="groups.length === 0">No groups for user ID: {{ authService.getUser().id }}</li>
 </ul>

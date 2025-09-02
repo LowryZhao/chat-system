@@ -12,9 +12,17 @@ router.get('/user/:userId', (req, res) => {
 
 router.post('/:groupId/join', (req, res) => {
   const groupId = req.params.groupId;
-  const { userId } = req.body; 
-  console.log(`Joining group ${groupId} for user ${userId}`);
-  res.json({ success: true, groupId, userId });
+  const { userId } = req.body;
+  console.log(`User ${userId} joining group ${groupId}`);
+  let groups = JSON.parse(localStorage.getItem('groupsData') || '[]');
+  const group = groups.find(g => g.id === groupId);
+  if (group && !group.members.includes(userId)) {
+    group.members.push(userId);
+    localStorage.setItem('groupsData', JSON.stringify(groups));
+    res.json({ success: true, groupId, userId });
+  } else {
+    res.status(400).json({ success: false, message: 'Join failed' });
+  }
 });
 
 module.exports = router;
