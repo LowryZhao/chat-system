@@ -42,12 +42,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     });
 
     this.chat.onUserJoined().subscribe(({ username }) => {
-      this.messages.push({ system: true, message: `👋 ${username} joined the channel.` });
+      this.messages.push({ system: true, message: `${username} joined the channel.` });
       this.scrollToBottom();
     });
 
     this.chat.onUserLeft().subscribe(({ username }) => {
-      this.messages.push({ system: true, message: `🚪 ${username} left the channel.` });
+      this.messages.push({ system: true, message: `${username} left the channel.` });
       this.scrollToBottom();
     });
 

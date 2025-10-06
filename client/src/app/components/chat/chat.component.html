@@ -2,7 +2,7 @@
 
 <div #scrollContainer class="chat-box">
   <div *ngFor="let msg of messages">
-    
+
     <div *ngIf="msg.system" class="system-msg">
       <em>{{ msg.message }}</em>
     </div>
@@ -19,6 +19,6 @@
 
 <div class="chat-input">
   <input [(ngModel)]="text" placeholder="Type message..." (keydown.enter)="send()" />
-  <input type="file" (change)="sendImage($event)" />
+  <input type="file" (change)="pickImage($event)" />
   <button (click)="send()">Send</button>
 </div>

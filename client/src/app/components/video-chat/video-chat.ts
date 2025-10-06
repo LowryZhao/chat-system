@@ -1,13 +1,14 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import Peer from 'peerjs';
 
 @Component({
   selector: 'app-video-chat',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   template: `
-    <h2> Video Chat</h2>
+    <h2>Video Chat</h2>
 
     <div class="video-container">
       <video #myVideo autoplay muted playsinline></video>
@@ -15,7 +16,9 @@ import Peer from 'peerjs';
     </div>
 
     <div class="control-panel">
-      <p><strong>Your Peer ID:</strong> {{ myPeerId }}</p>
+      <p *ngIf="!myPeerId">Connecting to PeerJS...</p>
+      <p *ngIf="myPeerId"><strong>Your Peer ID:</strong> {{ myPeerId }}</p>
+
       <input [(ngModel)]="remotePeerId" placeholder="Enter Remote Peer ID" />
       <button (click)="call()">Call</button>
     </div>
@@ -59,19 +62,18 @@ export class VideoChatComponent implements OnInit, OnDestroy {
       path: '/peerjs'
     });
 
-    this.peer.on('open', (id) => {
+    this.peer.on('open', id => {
       this.myPeerId = id;
       console.log('My Peer ID:', id);
     });
 
-    this.peer.on('call', async (call) => {
+    this.peer.on('call', async call => {
       console.log('Incoming call from:', call.peer);
       this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       call.answer(this.localStream);
 
       this.myVideo.nativeElement.srcObject = this.localStream;
-
-      call.on('stream', (remoteStream) => {
+      call.on('stream', remoteStream => {
         this.remoteVideo.nativeElement.srcObject = remoteStream;
       });
 
@@ -86,8 +88,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
 
     const call = this.peer.call(this.remotePeerId, this.localStream);
     this.callRef = call;
-
-    call.on('stream', (remoteStream) => {
+    call.on('stream', remoteStream => {
       this.remoteVideo.nativeElement.srcObject = remoteStream;
     });
   }
