@@ -25,12 +25,15 @@ exports.register = async (req, res) => {
     const exists = await users.findOne({ username });
     if (exists) return res.status(400).json({ error: 'Username taken' });
 
+    const count = await users.countDocuments();
     const newUser = {
+      id: String(count + 1),
       username,
       email,
       password,
       roles: ['user'],
-      groups: []
+      groups: [],
+      avatar: '/uploads/default-avatar.png'
     };
 
     await users.insertOne(newUser);
@@ -47,18 +50,21 @@ exports.createUserByAdmin = async (req, res) => {
     const db = await connectDB();
     const users = db.collection('users');
 
-    const admin = await users.findOne({ id: adminId, roles: 'super_admin' });
+    const admin = await users.findOne({ id: String(adminId), roles: { $in: ['super_admin'] } });
     if (!admin) return res.status(403).json({ error: 'Not authorized (Super Admin only)' });
 
     const exists = await users.findOne({ username });
     if (exists) return res.status(400).json({ error: 'Username already exists' });
 
+    const count = await users.countDocuments();
     const newUser = {
+      id: String(count + 1),
       username,
       email,
       password,
       roles: [role || 'user'],
-      groups: []
+      groups: [],
+      avatar: '/uploads/default-avatar.png'
     };
 
     await users.insertOne(newUser);
@@ -75,16 +81,37 @@ exports.removeUser = async (req, res) => {
     const db = await connectDB();
     const users = db.collection('users');
 
-    const admin = await users.findOne({ id: adminId, roles: 'super_admin' });
+    const admin = await users.findOne({ id: String(adminId), roles: { $in: ['super_admin'] } });
     if (!admin) return res.status(403).json({ error: 'Not authorized (Super Admin only)' });
 
-    const result = await users.deleteOne({ id: userId });
+    const result = await users.deleteOne({ id: String(userId) });
     if (result.deletedCount === 0)
       return res.status(404).json({ error: 'User not found' });
 
     res.json({ message: 'User removed successfully' });
   } catch (err) {
     console.error('RemoveUser error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+exports.updateAvatar = async (req, res) => {
+  try {
+    const { userId, avatarPath } = req.body;
+    const db = await connectDB();
+    const users = db.collection('users');
+
+    const result = await users.updateOne(
+      { id: String(userId) },
+      { $set: { avatar: avatarPath } }
+    );
+
+    if (result.matchedCount === 0)
+      return res.status(404).json({ error: 'User not found' });
+
+    res.json({ message: 'Avatar updated successfully', avatar: avatarPath });
+  } catch (err) {
+    console.error('UpdateAvatar error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 };

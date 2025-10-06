@@ -34,9 +34,21 @@ export class ChatService implements OnDestroy {
     this.socket.emit('leaveChannel', { channelId, username });
   }
 
-  sendMessage(channelId: string, userId: string, username: string, message: string) {
-    this.socket.emit('chatMessage', { channelId, userId, username, message });
-  }
+  sendMessage(
+  channelId: string,
+  userId: string,
+  username: string,
+  message?: string | null,
+  imageUrl?: string | null
+) {
+  this.socket.emit('chatMessage', {
+    channelId,
+    userId,
+    username,
+    message: message || null,
+    imageUrl: imageUrl || null
+  });
+}
 
   onHistory(): Observable<any[]> {
     return new Observable(observer => {

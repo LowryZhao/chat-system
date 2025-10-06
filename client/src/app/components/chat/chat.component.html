@@ -2,19 +2,23 @@
 
 <div #scrollContainer class="chat-box">
   <div *ngFor="let msg of messages">
+    
     <div *ngIf="msg.system" class="system-msg">
       <em>{{ msg.message }}</em>
     </div>
 
     <div *ngIf="!msg.system" class="user-msg">
+      <img *ngIf="msg.avatar" [src]="'http://localhost:3000' + msg.avatar" class="avatar" />
       <strong>{{ msg.username }}</strong>:
-      <span>{{ msg.message }}</span>
+      <span *ngIf="msg.message">{{ msg.message }}</span>
+      <img *ngIf="msg.imageUrl" [src]="'http://localhost:3000' + msg.imageUrl" class="chat-img" />
       <small *ngIf="msg.timestamp">({{ msg.timestamp | date:'shortTime' }})</small>
     </div>
   </div>
 </div>
 
 <div class="chat-input">
-  <input [(ngModel)]="text" placeholder="Type your message..." (keydown.enter)="send()" />
+  <input [(ngModel)]="text" placeholder="Type message..." (keydown.enter)="send()" />
+  <input type="file" (change)="sendImage($event)" />
   <button (click)="send()">Send</button>
 </div>
