@@ -1,71 +1,90 @@
-const data = require('../models/data');
-const { users } = data;
+const { connectDB } = require('../db');
 
-exports.login = (req, res) => {
-  const { username, password } = req.body;
-  const user = users.find(u => u.username === username && u.password === password);
-  if (user) return res.json(user);
-  return res.status(401).json({ error: 'Invalid credentials' });
-};
+exports.login = async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const db = await connectDB();
+    const users = db.collection('users');
 
-exports.register = (req, res) => {
-  const { username, email, password } = req.body;
+    const user = await users.findOne({ username, password });
+    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
 
-  if (users.find(u => u.username === username)) {
-    return res.status(400).json({ error: 'Username taken' });
+    res.json(user);
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Server error' });
   }
-
-  const newUser = {
-    id: String(users.length + 1),
-    username,
-    email,
-    password,
-    roles: ['user'], 
-    groups: []
-  };
-
-  users.push(newUser);
-  res.json(newUser);
 };
 
-exports.createUserByAdmin = (req, res) => {
-  const { adminId, username, email, password, role } = req.body;
+exports.register = async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    const db = await connectDB();
+    const users = db.collection('users');
 
-  const admin = users.find(u => u.id === adminId && u.roles.includes('super_admin'));
-  if (!admin) return res.status(403).json({ error: 'Not authorized (Super Admin only)' });
+    const exists = await users.findOne({ username });
+    if (exists) return res.status(400).json({ error: 'Username taken' });
 
-  if (users.find(u => u.username === username)) {
-    return res.status(400).json({ error: 'Username already exists' });
+    const newUser = {
+      username,
+      email,
+      password,
+      roles: ['user'],
+      groups: []
+    };
+
+    await users.insertOne(newUser);
+    res.json(newUser);
+  } catch (err) {
+    console.error('Register error:', err);
+    res.status(500).json({ error: 'Server error' });
   }
-
-  const newUser = {
-    id: String(users.length + 1),
-    username,
-    email,
-    password,
-    roles: [role || 'user'],
-    groups: []
-  };
-
-  users.push(newUser);
-
-  data.saveData();
-  
-  res.json({ message: 'User created successfully', user: newUser });
 };
 
-exports.removeUser = (req, res) => {
-  const { adminId, userId } = req.body;
+exports.createUserByAdmin = async (req, res) => {
+  try {
+    const { adminId, username, email, password, role } = req.body;
+    const db = await connectDB();
+    const users = db.collection('users');
 
-  const admin = users.find(u => u.id === adminId && u.roles.includes('super_admin'));
-  if (!admin) return res.status(403).json({ error: 'Not authorized (Super Admin only)' });
+    const admin = await users.findOne({ id: adminId, roles: 'super_admin' });
+    if (!admin) return res.status(403).json({ error: 'Not authorized (Super Admin only)' });
 
-  const index = users.findIndex(u => u.id === userId);
-  if (index === -1) return res.status(404).json({ error: 'User not found' });
+    const exists = await users.findOne({ username });
+    if (exists) return res.status(400).json({ error: 'Username already exists' });
 
-  const removed = users.splice(index, 1);
+    const newUser = {
+      username,
+      email,
+      password,
+      roles: [role || 'user'],
+      groups: []
+    };
 
-  data.saveData();
+    await users.insertOne(newUser);
+    res.json({ message: 'User created successfully', user: newUser });
+  } catch (err) {
+    console.error('CreateUserByAdmin error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
 
-  res.json({ message: 'User removed successfully', removed });
+exports.removeUser = async (req, res) => {
+  try {
+    const { adminId, userId } = req.body;
+    const db = await connectDB();
+    const users = db.collection('users');
+
+    const admin = await users.findOne({ id: adminId, roles: 'super_admin' });
+    if (!admin) return res.status(403).json({ error: 'Not authorized (Super Admin only)' });
+
+    const result = await users.deleteOne({ id: userId });
+    if (result.deletedCount === 0)
+      return res.status(404).json({ error: 'User not found' });
+
+    res.json({ message: 'User removed successfully' });
+  } catch (err) {
+    console.error('RemoveUser error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
 };

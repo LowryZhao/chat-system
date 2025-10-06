@@ -1,133 +1,138 @@
-const data = require('../models/data');
-const { users, groups, channels } = data;
+const { connectDB } = require('../db');
 
-function isGroupAdmin(userId, group) {
-  return group.admins.includes(userId) || isSuperAdmin(userId);
-}
-function isSuperAdmin(userId) {
-  const u = users.find(u => u.id === userId);
-  return u && u.roles && u.roles.includes('super_admin');
+async function isSuperAdmin(db, userId) {
+  const user = await db.collection('users').findOne({ id: userId });
+  return user?.roles?.includes('super_admin');
 }
 
-exports.createGroup = (req, res) => {
-  const { name, adminId } = req.body;
+async function isGroupAdmin(db, userId, group) {
+  return group.admins.includes(userId) || await isSuperAdmin(db, userId);
+}
 
-  const admin = users.find(
-    (u) => u.id === adminId && (u.roles.includes('super_admin') || u.roles.includes('group_admin'))
-  );
-  if (!admin) return res.status(403).json({ error: 'Not authorized' });
+exports.createGroup = async (req, res) => {
+  try {
+    const { name, adminId } = req.body;
+    const db = await connectDB();
+    const users = db.collection('users');
+    const groups = db.collection('groups');
 
-  const newGroup = {
-    id: String(groups.length + 1),
-    name,
-    admins: [adminId],
-    members: [adminId],
-    channels: []
-  };
+    const admin = await users.findOne({ id: adminId });
+    if (!admin || !admin.roles.some(r => ['super_admin', 'group_admin'].includes(r)))
+      return res.status(403).json({ error: 'Not authorized' });
 
-  groups.push(newGroup);
+    const newGroup = {
+      id: String(Date.now()),
+      name,
+      admins: [adminId],
+      members: [adminId],
+      channels: []
+    };
 
-  const adminUser = users.find((u) => u.id === adminId);
-  if (adminUser && !adminUser.groups.includes(newGroup.id)) {
-    adminUser.groups.push(newGroup.id);
+    await groups.insertOne(newGroup);
+    await users.updateOne({ id: adminId }, { $addToSet: { groups: newGroup.id } });
+
+    res.json(newGroup);
+  } catch (err) {
+    console.error('Create group error:', err);
+    res.status(500).json({ error: 'Server error' });
   }
-
-  data.saveData();
-
-  console.log(`New group created: ${name} by user ${adminId}`);
-  return res.json(newGroup);
 };
 
-exports.getAllGroups = (req, res) => {
-  return res.json(groups);
+exports.getAllGroups = async (req, res) => {
+  try {
+    const db = await connectDB();
+    const groups = await db.collection('groups').find().toArray();
+    res.json(groups);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
 };
 
-exports.addUserToGroup = (req, res) => {
-  const { groupId } = req.params;
-  const { adminId, userId } = req.body;
+exports.addUserToGroup = async (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const { adminId, userId } = req.body;
+    const db = await connectDB();
+    const groupsCol = db.collection('groups');
+    const usersCol = db.collection('users');
 
-  const group = groups.find((g) => g.id === groupId);
-  if (!group) return res.status(404).json({ error: 'Group not found' });
+    const group = await groupsCol.findOne({ id: groupId });
+    if (!group) return res.status(404).json({ error: 'Group not found' });
 
-  if (!isGroupAdmin(adminId, group)) {
-    return res.status(403).json({ error: 'Only Group Admin or Super Admin can add members' });
+    if (!(await isGroupAdmin(db, adminId, group)))
+      return res.status(403).json({ error: 'Not authorized' });
+
+    await groupsCol.updateOne({ id: groupId }, { $addToSet: { members: userId } });
+    await usersCol.updateOne({ id: userId }, { $addToSet: { groups: groupId } });
+
+    res.json({ message: 'User added to group successfully' });
+  } catch (err) {
+    console.error('Add user to group error:', err);
+    res.status(500).json({ error: 'Server error' });
   }
-
-  if (!group.members.includes(userId)) {
-    group.members.push(userId);
-  }
-
-  const user = users.find((u) => u.id === userId);
-  if (user && !user.groups.includes(groupId)) {
-    user.groups.push(groupId);
-  }
-
-  data.saveData();
-
-  console.log(`👥 User ${userId} added to group ${groupId}`);
-  return res.json({ message: 'User added to group successfully', group });
 };
 
-exports.removeUserFromGroup = (req, res) => {
-  const { groupId } = req.params;
-  const { adminId, userId } = req.body;
+exports.removeUserFromGroup = async (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const { adminId, userId } = req.body;
+    const db = await connectDB();
+    const groupsCol = db.collection('groups');
+    const usersCol = db.collection('users');
 
-  const group = groups.find((g) => g.id === groupId);
-  if (!group) return res.status(404).json({ error: 'Group not found' });
+    const group = await groupsCol.findOne({ id: groupId });
+    if (!group) return res.status(404).json({ error: 'Group not found' });
 
-  if (!isGroupAdmin(adminId, group)) {
-    return res.status(403).json({ error: 'Only Group Admin or Super Admin can remove members' });
+    if (!(await isGroupAdmin(db, adminId, group)))
+      return res.status(403).json({ error: 'Not authorized' });
+
+    await groupsCol.updateOne({ id: groupId }, { $pull: { members: userId } });
+    await usersCol.updateOne({ id: userId }, { $pull: { groups: groupId } });
+
+    res.json({ message: 'User removed from group successfully' });
+  } catch (err) {
+    console.error('Remove user from group error:', err);
+    res.status(500).json({ error: 'Server error' });
   }
-
-  group.members = group.members.filter((id) => id !== userId);
-
-  const user = users.find((u) => u.id === userId);
-  if (user) {
-    user.groups = user.groups.filter((id) => id !== groupId);
-  }
-
-  data.saveData();
-
-  console.log(`👤 User ${userId} removed from group ${groupId}`);
-  return res.json({ message: 'User removed from group successfully', group });
 };
 
-exports.deleteGroup = (req, res) => {
-  const { groupId } = req.params;
-  const { adminId } = req.body;
+exports.deleteGroup = async (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const { adminId } = req.body;
+    const db = await connectDB();
+    const groupsCol = db.collection('groups');
+    const usersCol = db.collection('users');
+    const channelsCol = db.collection('channels');
 
-  const index = groups.findIndex(g => g.id === groupId);
-  if (index === -1) return res.status(404).json({ error: 'Group not found' });
+    const group = await groupsCol.findOne({ id: groupId });
+    if (!group) return res.status(404).json({ error: 'Group not found' });
 
-  const group = groups[index];
-  if (!isGroupAdmin(adminId, group)) {
-    return res.status(403).json({ error: 'Only Group Admin or Super Admin can delete groups' });
+    if (!(await isGroupAdmin(db, adminId, group)))
+      return res.status(403).json({ error: 'Not authorized' });
+
+    await channelsCol.deleteMany({ groupId });
+    await groupsCol.deleteOne({ id: groupId });
+    await usersCol.updateMany({}, { $pull: { groups: groupId } });
+
+    res.json({ message: 'Group deleted successfully' });
+  } catch (err) {
+    console.error('Delete group error:', err);
+    res.status(500).json({ error: 'Server error' });
   }
-
-  for (let i = channels.length - 1; i >= 0; i--) {
-    if (channels[i].groupId === groupId) {
-      channels.splice(i, 1);
-    }
-  }
-
-  users.forEach(u => {
-    u.groups = u.groups.filter(id => id !== groupId);
-  });
-
-  groups.splice(index, 1);
-
-  data.saveData();
-
-  console.log(`Group ${groupId} deleted by ${adminId}`);
-  return res.json({ message: 'Group deleted successfully' });
 };
 
-exports.getUserGroups = (req, res) => {
-  const { userId } = req.params;
+exports.getUserGroups = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const db = await connectDB();
+    const groups = await db.collection('groups')
+      .find({ members: userId })
+      .toArray();
 
-  const user = users.find((u) => u.id === userId);
-  if (!user) return res.status(404).json({ error: 'User not found' });
-
-  const userGroups = groups.filter((g) => g.members.includes(userId));
-  return res.json(userGroups);
+    res.json(groups);
+  } catch (err) {
+    console.error('Get user groups error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
 };

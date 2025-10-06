@@ -1,125 +1,161 @@
-const data = require('../models/data');
-const { users, groups, channels } = data;
+const { connectDB } = require('../db');
 
-function isGroupAdmin(userId, group) {
-  return group.admins.includes(userId) || isSuperAdmin(userId);
-}
-function isSuperAdmin(userId) {
-  const u = users.find(u => u.id === userId);
-  return !!u && u.roles && u.roles.includes('super_admin');
+async function isSuperAdmin(db, userId) {
+  const user = await db.collection('users').findOne({ id: userId });
+  return user?.roles?.includes('super_admin');
 }
 
-exports.createChannel = (req, res) => {
-  const { name, groupId, adminId } = req.body;
+async function isGroupAdmin(db, userId, group) {
+  return group.admins.includes(userId) || await isSuperAdmin(db, userId);
+}
 
-  const group = groups.find(g => g.id === String(groupId));
-  if (!group) return res.status(404).json({ error: 'Group not found' });
+exports.createChannel = async (req, res) => {
+  try {
+    const { name, groupId, adminId } = req.body;
+    const db = await connectDB();
+    const groups = db.collection('groups');
+    const channels = db.collection('channels');
 
-  if (!isGroupAdmin(adminId, group)) return res.status(403).json({ error: 'Not authorized' });
+    const group = await groups.findOne({ id: String(groupId) });
+    if (!group) return res.status(404).json({ error: 'Group not found' });
 
-  const newChannel = {
-    id: String(channels.length + 1),
-    name,
-    groupId: String(groupId),
-    members: [adminId]
-  };
+    if (!(await isGroupAdmin(db, adminId, group)))
+      return res.status(403).json({ error: 'Not authorized' });
 
-  channels.push(newChannel);
-  if (!group.channels.includes(newChannel.id)) group.channels.push(newChannel.id);
+    const newChannel = {
+      id: String(Date.now()),
+      name,
+      groupId: String(groupId),
+      members: [adminId]
+    };
 
-  data.saveData();
+    await channels.insertOne(newChannel);
+    await groups.updateOne(
+      { id: String(groupId) },
+      { $addToSet: { channels: newChannel.id } }
+    );
 
-  console.log(`New channel created: ${name} (Group ${groupId}) by user ${adminId}`);
-  return res.json({ message: 'Channel created successfully', channel: newChannel });
-};
-
-
-exports.addUserToChannel = (req, res) => {
-  const { channelId } = req.params;
-  const { adminId, userId } = req.body;
-
-  const channel = channels.find(c => c.id === channelId);
-  if (!channel) return res.status(404).json({ error: 'Channel not found' });
-
-  const group = groups.find(g => g.id === channel.groupId);
-  if (!group) return res.status(404).json({ error: 'Group not found' });
-  if (!isGroupAdmin(adminId, group)) return res.status(403).json({ error: 'Not authorized' });
-
-  if (!group.members.includes(userId)) group.members.push(userId);
-  if (!channel.members) channel.members = [];
-  if (!channel.members.includes(userId)) channel.members.push(userId);
-
-  data.saveData();
-
-  console.log(`👥 User ${userId} added to channel ${channelId} by ${adminId}`);
-  res.json({ message: 'User added to channel successfully', channel });
-};
-
-exports.removeUserFromChannel = (req, res) => {
-  const { channelId } = req.params;
-  const { adminId, userId } = req.body;
-
-  const channel = channels.find(c => c.id === channelId);
-  if (!channel) return res.status(404).json({ error: 'Channel not found' });
-
-  const group = groups.find(g => g.id === channel.groupId);
-  if (!group) return res.status(404).json({ error: 'Group not found' });
-  if (!isGroupAdmin(adminId, group)) return res.status(403).json({ error: 'Not authorized' });
-
-  channel.members = channel.members.filter(id => id !== userId);
-
-  data.saveData();
-
-  console.log(`👤 User ${userId} removed from channel ${channelId} by ${adminId}`);
-  res.json({ message: 'User removed from channel successfully', channel });
-};
-
-exports.getGroupChannelsForUser = (req, res) => {
-  const { groupId } = req.params;
-  const { userId } = req.query;
-
-  const visibleChannels = channels.filter(
-    c => c.groupId === groupId && c.members && c.members.includes(userId)
-  );
-
-  return res.json(visibleChannels);
-};
-
-exports.leaveChannel = (req, res) => {
-  const { channelId, userId } = req.body;
-
-  const channel = channels.find(c => c.id === channelId);
-  if (!channel) return res.status(404).json({ error: 'Channel not found' });
-
-  channel.members = channel.members.filter(id => id !== userId);
-
-  data.saveData();
-
-  console.log(`User ${userId} left channel ${channelId}`);
-  res.json({ message: 'Left channel successfully' });
-};
-
-exports.deleteChannel = (req, res) => {
-  const { channelId } = req.params;
-  const { adminId } = req.body;
-
-  const channelIndex = channels.findIndex(c => c.id === channelId);
-  if (channelIndex === -1) return res.status(404).json({ error: 'Channel not found' });
-
-  const channel = channels[channelIndex];
-  const group = groups.find(g => g.id === channel.groupId);
-  if (!group) return res.status(404).json({ error: 'Group not found' });
-
-  if (!isGroupAdmin(adminId, group)) {
-    return res.status(403).json({ error: 'Not authorized to delete channel' });
+    console.log(`New channel created: ${name} (Group ${groupId}) by user ${adminId}`);
+    res.json({ message: 'Channel created successfully', channel: newChannel });
+  } catch (err) {
+    console.error('Create channel error:', err);
+    res.status(500).json({ error: 'Server error' });
   }
+};
 
-  group.channels = group.channels.filter(id => id !== channelId);
+exports.addUserToChannel = async (req, res) => {
+  try {
+    const { channelId } = req.params;
+    const { adminId, userId } = req.body;
+    const db = await connectDB();
+    const channels = db.collection('channels');
+    const groups = db.collection('groups');
 
-  channels.splice(channelIndex, 1);
+    const channel = await channels.findOne({ id: channelId });
+    if (!channel) return res.status(404).json({ error: 'Channel not found' });
 
-  data.saveData();
+    const group = await groups.findOne({ id: channel.groupId });
+    if (!group) return res.status(404).json({ error: 'Group not found' });
 
-  console.log(`Channel ${channelId} deleted by user ${adminId}`);
-  return res.json({ message: 'Channel deleted successfully' });
+    if (!(await isGroupAdmin(db, adminId, group)))
+      return res.status(403).json({ error: 'Not authorized' });
+
+    await groups.updateOne({ id: group.id }, { $addToSet: { members: userId } });
+    await channels.updateOne({ id: channelId }, { $addToSet: { members: userId } });
+
+    console.log(`👥 User ${userId} added to channel ${channelId} by ${adminId}`);
+    res.json({ message: 'User added to channel successfully' });
+  } catch (err) {
+    console.error('Add user error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+exports.removeUserFromChannel = async (req, res) => {
+  try {
+    const { channelId } = req.params;
+    const { adminId, userId } = req.body;
+    const db = await connectDB();
+    const channels = db.collection('channels');
+    const groups = db.collection('groups');
+
+    const channel = await channels.findOne({ id: channelId });
+    if (!channel) return res.status(404).json({ error: 'Channel not found' });
+
+    const group = await groups.findOne({ id: channel.groupId });
+    if (!group) return res.status(404).json({ error: 'Group not found' });
+
+    if (!(await isGroupAdmin(db, adminId, group)))
+      return res.status(403).json({ error: 'Not authorized' });
+
+    await channels.updateOne({ id: channelId }, { $pull: { members: userId } });
+
+    console.log(`👤 User ${userId} removed from channel ${channelId} by ${adminId}`);
+    res.json({ message: 'User removed from channel successfully' });
+  } catch (err) {
+    console.error('Remove user error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+exports.getGroupChannelsForUser = async (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const { userId } = req.query;
+    const db = await connectDB();
+    const channels = db.collection('channels');
+
+    const visibleChannels = await channels
+      .find({ groupId: String(groupId), members: userId })
+      .toArray();
+
+    res.json(visibleChannels);
+  } catch (err) {
+    console.error('Get channels error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+exports.leaveChannel = async (req, res) => {
+  try {
+    const { channelId, userId } = req.body;
+    const db = await connectDB();
+    const channels = db.collection('channels');
+
+    await channels.updateOne({ id: channelId }, { $pull: { members: userId } });
+
+    console.log(`🚪 User ${userId} left channel ${channelId}`);
+    res.json({ message: 'Left channel successfully' });
+  } catch (err) {
+    console.error('Leave channel error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+exports.deleteChannel = async (req, res) => {
+  try {
+    const { channelId } = req.params;
+    const { adminId } = req.body;
+    const db = await connectDB();
+    const channels = db.collection('channels');
+    const groups = db.collection('groups');
+
+    const channel = await channels.findOne({ id: channelId });
+    if (!channel) return res.status(404).json({ error: 'Channel not found' });
+
+    const group = await groups.findOne({ id: channel.groupId });
+    if (!group) return res.status(404).json({ error: 'Group not found' });
+
+    if (!(await isGroupAdmin(db, adminId, group)))
+      return res.status(403).json({ error: 'Not authorized' });
+
+    await channels.deleteOne({ id: channelId });
+    await groups.updateOne({ id: group.id }, { $pull: { channels: channelId } });
+
+    console.log(`Channel ${channelId} deleted by ${adminId}`);
+    res.json({ message: 'Channel deleted successfully' });
+  } catch (err) {
+    console.error('Delete channel error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
 };
