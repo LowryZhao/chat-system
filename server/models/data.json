@@ -23,13 +23,21 @@
       "email": "user2@example.com",
       "roles": ["user"],
       "groups": []
+    },
+    {
+      "id": "4",
+      "username": "groupadmin",
+      "password": "123",
+      "email": "groupadmin@example.com",
+      "roles": ["group_admin"],
+      "groups": []
     }
   ],
   "groups": [
     {
       "id": "1",
       "name": "Group 1",
-      "admins": ["1"],
+      "admins": ["1", "4"],
       "members": ["1", "2"],
       "channels": ["1", "2"]
     },

@@ -16,7 +16,7 @@ function loadData() {
       db = JSON.parse(raw);
       console.log('Data loaded from data.json');
     } else {
-      console.log('No data.json found, starting with default data...');
+      console.log('⚠️  No data.json found, creating default data...');
       db = {
         users: [
           {
@@ -29,6 +29,14 @@ function loadData() {
           },
           {
             id: '2',
+            username: 'groupadmin',
+            password: '123',
+            email: 'groupadmin@example.com',
+            roles: ['group_admin'],
+            groups: []
+          },
+          {
+            id: '3',
             username: 'user1',
             password: '123',
             email: 'user1@example.com',
@@ -36,7 +44,7 @@ function loadData() {
             groups: []
           },
           {
-            id: '3',
+            id: '4',
             username: 'user2',
             password: '123',
             email: 'user2@example.com',
@@ -48,22 +56,14 @@ function loadData() {
           {
             id: '1',
             name: 'Group 1',
-            admins: ['1'],
-            members: ['1', '2'],
+            admins: ['1', '2'],
+            members: ['1', '2', '3'],
             channels: ['1', '2']
-          },
-          {
-            id: '2',
-            name: 'Group 2',
-            admins: ['1'],
-            members: ['1', '3'],
-            channels: ['3']
           }
         ],
         channels: [
-          { id: '1', name: 'General', groupId: '1', members: ['1', '2'] },
-          { id: '2', name: 'Random', groupId: '1', members: ['1'] },
-          { id: '3', name: 'Announcements', groupId: '2', members: ['1', '3'] }
+          { id: '1', name: 'General', groupId: '1', members: ['1', '2', '3'] },
+          { id: '2', name: 'Announcements', groupId: '1', members: ['1', '2'] }
         ]
       };
       saveData();
@@ -76,7 +76,7 @@ function loadData() {
 function saveData() {
   try {
     fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), 'utf-8');
-    console.log('Data saved to data.json');
+    console.log('💾 Data saved to data.json');
   } catch (err) {
     console.error('Error saving data.json:', err);
   }

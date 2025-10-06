@@ -1,4 +1,12 @@
-const { users, groups } = require('../models/data');
+const { users, groups, channels } = require('../models/data');
+
+function isGroupAdmin(userId, group) {
+  return group.admins.includes(userId) || isSuperAdmin(userId);
+}
+function isSuperAdmin(userId) {
+  const u = users.find(u => u.id === userId);
+  return u && u.roles && u.roles.includes('super_admin');
+}
 
 exports.createGroup = (req, res) => {
   const { name, adminId } = req.body;
@@ -18,26 +26,27 @@ exports.createGroup = (req, res) => {
 
   groups.push(newGroup);
 
-  const adminUser = users.find((u) => u.id === adminId);
-  if (adminUser && !adminUser.groups.includes(newGroup.id)) {
-    adminUser.groups.push(newGroup.id);
+  if (!admin.groups.includes(newGroup.id)) {
+    admin.groups.push(newGroup.id);
   }
 
   return res.json(newGroup);
 };
 
 exports.getAllGroups = (req, res) => {
-  const { groups } = require('../models/data');
   return res.json(groups);
 };
 
-
 exports.addUserToGroup = (req, res) => {
   const { groupId } = req.params;
-  const { userId } = req.body;
+  const { adminId, userId } = req.body;
 
   const group = groups.find((g) => g.id === groupId);
   if (!group) return res.status(404).json({ error: 'Group not found' });
+
+  if (!isGroupAdmin(adminId, group)) {
+    return res.status(403).json({ error: 'Only Group Admin or Super Admin can add members' });
+  }
 
   if (!group.members.includes(userId)) {
     group.members.push(userId);
@@ -48,24 +57,61 @@ exports.addUserToGroup = (req, res) => {
     user.groups.push(groupId);
   }
 
-  return res.json({ message: 'Joined group successfully', group });
+  return res.json({ message: 'User added to group successfully', group });
 };
 
 exports.removeUserFromGroup = (req, res) => {
   const { groupId } = req.params;
-  const { userId } = req.body;
+  const { adminId, userId } = req.body;
 
   const group = groups.find((g) => g.id === groupId);
   if (!group) return res.status(404).json({ error: 'Group not found' });
 
+  if (!isGroupAdmin(adminId, group)) {
+    return res.status(403).json({ error: 'Only Group Admin or Super Admin can remove members' });
+  }
+
   group.members = group.members.filter((id) => id !== userId);
+
+  channels.forEach(c => {
+    if (c.groupId === groupId) {
+      c.members = c.members.filter(id => id !== userId);
+    }
+  });
 
   const user = users.find((u) => u.id === userId);
   if (user) {
     user.groups = user.groups.filter((id) => id !== groupId);
   }
 
-  return res.json({ message: 'Left group successfully', group });
+  return res.json({ message: 'User removed from group successfully', group });
+};
+
+exports.deleteGroup = (req, res) => {
+  const { groupId } = req.params;
+  const { adminId } = req.body;
+
+  const index = groups.findIndex(g => g.id === groupId);
+  if (index === -1) return res.status(404).json({ error: 'Group not found' });
+
+  const group = groups[index];
+  if (!isGroupAdmin(adminId, group)) {
+    return res.status(403).json({ error: 'Only Group Admin or Super Admin can delete groups' });
+  }
+
+  for (let i = channels.length - 1; i >= 0; i--) {
+    if (channels[i].groupId === groupId) {
+      channels.splice(i, 1);
+    }
+  }
+
+  users.forEach(u => {
+    u.groups = u.groups.filter(id => id !== groupId);
+  });
+
+  groups.splice(index, 1);
+
+  return res.json({ message: 'Group deleted successfully' });
 };
 
 exports.getUserGroups = (req, res) => {
