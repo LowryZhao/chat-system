@@ -13,21 +13,28 @@ export class ChannelService {
     return this.http.post<Channel>(`${this.apiUrl}/create`, { name, groupId, adminId });
   }
 
-  joinChannel(channelId: string, userId: string): Observable<Channel> {
-    return this.http.post<Channel>(`${this.apiUrl}/join`, { channelId, userId });
+  addUserToChannel(channelId: string, adminId: string, userId: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/${channelId}/add-user`, { adminId, userId });
+  }
+
+  removeUserFromChannel(channelId: string, adminId: string, userId: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/${channelId}/remove-user`, { adminId, userId });
   }
 
   leaveChannel(channelId: string, userId: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/leave`, { channelId, userId });
   }
 
-  getGroupChannels(groupId: string): Observable<Channel[]> {
-    return this.http.get<Channel[]>(`${this.apiUrl}/group/${groupId}`);
+  getGroupChannels(groupId: string, userId: string): Observable<Channel[]> {
+    return this.http.get<Channel[]>(`${this.apiUrl}/group/${groupId}`, {
+      params: { userId }
+    });
   }
 
   saveChannels(channels: Channel[]) {
     localStorage.setItem('channels', JSON.stringify(channels));
   }
+
   getChannels(): Channel[] {
     return JSON.parse(localStorage.getItem('channels') || '[]');
   }
