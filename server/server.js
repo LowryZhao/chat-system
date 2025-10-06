@@ -14,6 +14,33 @@ const channelRoutes = require('./routes/channelRoutes');
 const app = express();
 const server = http.createServer(app);
 
+const corsOptions = {
+  origin: 'http://localhost:4200',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
+app.use(express.json());
+app.use('/uploads', express.static(path.resolve(__dirname, 'uploads')));
+
+app.use('/api/upload', uploadRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/groups', groupRoutes);
+app.use('/api/channels', channelRoutes);
+
+app.get('/', (req, res) =>
+  res.send('Chat System API + Socket.IO + PeerJS + Image Support')
+);
+
+let db;
+(async () => {
+  db = await connectDB();
+  console.log('MongoDB Connected');
+})();
+
 const io = new Server(server, {
   cors: {
     origin: 'http://localhost:4200',
@@ -22,26 +49,6 @@ const io = new Server(server, {
     credentials: true
   }
 });
-
-const PORT = 3000;
-
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-app.use('/api/upload', uploadRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/groups', groupRoutes);
-app.use('/api/channels', channelRoutes);
-
-app.use(cors());
-app.use(express.json());
-
-app.get('/', (req, res) => res.send('Chat System API + Socket.IO + PeerJS + Image Support'));
-
-let db;
-(async () => {
-  db = await connectDB();
-  console.log('MongoDB Connected');
-})();
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
@@ -87,14 +94,20 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => console.log('User disconnected:', socket.id));
 });
 
+const PORT = 3000;
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
 
 const peerApp = express();
+peerApp.use(cors(corsOptions));
+
 const peerServer = ExpressPeerServer(http.createServer(peerApp), {
-  path: '/',
+  path: '/peerjs',
   debug: true
 });
-peerApp.use('/', peerServer);
-peerApp.listen(3001, () => console.log('PeerJS server running on port 3001'));
+
+peerApp.use('/peerjs', peerServer);
+peerApp.listen(3001, () =>
+  console.log('PeerJS server running on http://localhost:3001/peerjs')
+);
