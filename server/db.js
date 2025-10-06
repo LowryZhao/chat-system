@@ -1,16 +1,18 @@
 const { MongoClient } = require('mongodb');
 
-const uri = 'mongodb://127.0.0.1:27017';
-const dbName = 'chatApp';
-let client;
+const uri = process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/chatapp';
+const client = new MongoClient(uri);
 
 async function connectDB() {
-  if (!client || !client.topology?.isConnected()) {
-    client = new MongoClient(uri);
+  if (!client.topology?.isConnected()) {
     await client.connect();
     console.log('Connected to MongoDB');
   }
-  return client.db(dbName);
+  return client.db('chatapp');
 }
 
-module.exports = { connectDB };
+async function closeDB() {
+  await client.close();
+}
+
+module.exports = { connectDB, closeDB };
