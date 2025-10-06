@@ -1,18 +1,19 @@
-<form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+<div class="login-container">
   <h2>{{ isRegister ? 'Register' : 'Login' }}</h2>
-  <div>
-    <label for="username">Username:</label>
-    <input [(ngModel)]="username" name="username" required>
-  </div>
-  <div *ngIf="isRegister">
-    <label for="email">Email:</label>
-    <input [(ngModel)]="email" name="email" type="email" required>
-  </div>
-  <div>
-    <label for="password">Password:</label>
-    <input [(ngModel)]="password" name="password" type="password" required>
-  </div>
-  <button type="submit">{{ isRegister ? 'Register' : 'Login' }}</button>
-  <button type="button" (click)="toggleMode()">{{ isRegister ? 'Switch to Login' : 'Switch to Register' }}</button>
-  <div *ngIf="error" style="color: red">{{ error }}</div>
-</form>
+
+  <form (ngSubmit)="onSubmit()">
+    <input [(ngModel)]="username" name="username" placeholder="Username" required />
+    <input *ngIf="isRegister" [(ngModel)]="email" name="email" placeholder="Email" required />
+    <input [(ngModel)]="password" name="password" placeholder="Password" type="password" required />
+
+    <button type="submit" [disabled]="loading">
+      {{ isRegister ? 'Register' : 'Login' }}
+    </button>
+
+    <button type="button" (click)="toggleMode()" class="toggle-btn">
+      {{ isRegister ? 'Already have an account? Login' : 'New user? Register' }}
+    </button>
+
+    <p *ngIf="error" class="error">{{ error }}</p>
+  </form>
+</div>

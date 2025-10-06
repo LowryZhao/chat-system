@@ -17,18 +17,28 @@ export class AuthService {
     this.user = raw ? JSON.parse(raw) : null;
   }
 
-  private saveUser(user: any) {
+  public saveUser(user: any) {
+    if (!user) return;
     this.user = user;
     localStorage.setItem(this.userKey, JSON.stringify(user));
   }
 
   login(username: string, password: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/login`, { username, password })
-      .pipe(tap(u => this.saveUser(u)));
+    return this.http
+      .post<any>(`${this.apiUrl}/login`, { username, password })
+      .pipe(
+        tap((u) => {
+          if (u) this.saveUser(u);
+        })
+      );
   }
 
   register(username: string, email: string, password: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/register`, { username, email, password });
+    return this.http.post<any>(`${this.apiUrl}/register`, {
+      username,
+      email,
+      password,
+    });
   }
 
   logout() {
@@ -37,15 +47,17 @@ export class AuthService {
   }
 
   getUser() {
+    if (!this.user) this.loadUser();
     return this.user || {};
   }
 
   isAuthenticated(): boolean {
-    return !!this.user?.username;
+    return !!this.getUser()?.username;
   }
 
   hasRole(role: string): boolean {
-    return !!this.user?.roles?.includes(role);
+    const user = this.getUser();
+    return !!user?.roles?.includes(role);
   }
 
   isSuperAdmin(): boolean {

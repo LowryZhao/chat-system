@@ -1,58 +1,77 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../services/auth';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-login',
-  templateUrl: './login.html',
   standalone: true,
+  templateUrl: './login.html',
+  styleUrls: ['./login.css'],
   imports: [CommonModule, FormsModule]
 })
 export class LoginComponent {
-  username: string = '';
-  password: string = '';
-  email: string = '';
-  isRegister: boolean = false;
+  username = '';
+  password = '';
+  email = '';
+  isRegister = false;
   error: string | null = null;
+  loading = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
-    if (this.isRegister) {
-      this.register();
-    } else {
-      this.login();
-    }
+    this.isRegister ? this.register() : this.login();
   }
 
   login() {
     this.error = null;
-    console.log(`Submitting login: username=${this.username}, password=${this.password}`);
-    this.authService.login(this.username, this.password).subscribe(
-      (user) => {
-        console.log('Login response:', user);
-        if (user) this.router.navigate(['/groups']);
+    this.loading = true;
+
+    console.log(`Attempting login: ${this.username}`);
+
+    this.authService.login(this.username, this.password).subscribe({
+      next: (user) => {
+        console.log('Login successful:', user);
+
+        if (user) {
+          this.authService.saveUser(user);
+
+          setTimeout(() => {
+            this.router.navigate(['/groups']);
+          }, 300);
+        } else {
+          this.error = 'Invalid credentials, please try again.';
+        }
+
+        this.loading = false;
       },
-      (err) => {
-        console.error('Login error:', err.message);
+      error: (err) => {
+        console.error('Login failed:', err);
         this.error = 'Login failed. Please try again.';
+        this.loading = false;
       }
-    );
+    });
   }
 
   register() {
-  this.error = null;
-  this.authService.register(this.username, this.email, this.password).subscribe(
-    () => {
-      this.isRegister = false;
-      this.error = 'Registration successful, please login';
-      this.password = '';
-    },
-    () => this.error = 'Registration failed. Please try again.'
-  );
-}
+    this.error = null;
+    this.loading = true;
+
+    this.authService.register(this.username, this.email, this.password).subscribe({
+      next: () => {
+        this.isRegister = false;
+        this.password = '';
+        this.error = 'Registration successful. Please login.';
+        this.loading = false;
+      },
+      error: () => {
+        this.error = 'Registration failed. Please try again.';
+        this.loading = false;
+      }
+    });
+  }
 
   toggleMode() {
     this.isRegister = !this.isRegister;
