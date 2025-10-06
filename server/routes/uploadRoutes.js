@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { connectDB } = require('../db');
 const router = express.Router();
 
 const baseDir = path.join(__dirname, '../uploads');
@@ -34,7 +35,6 @@ const avatarStorage = multer.diskStorage({
 });
 const uploadAvatar = multer({ storage: avatarStorage });
 
-
 router.post('/image', uploadChat.single('image'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
   const filePath = `/uploads/chat/${req.file.filename}`;
@@ -42,11 +42,36 @@ router.post('/image', uploadChat.single('image'), (req, res) => {
   res.json({ path: filePath });
 });
 
-router.post('/avatar', uploadAvatar.single('avatar'), (req, res) => {
+router.post('/avatar', uploadAvatar.single('avatar'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
   const filePath = `/uploads/avatars/${req.file.filename}`;
-  console.log(`Avatar uploaded: ${filePath}`);
-  res.json({ path: filePath });
+  const userId = req.body.userId; 
+
+  console.log(`Avatar uploaded for user ${userId}: ${filePath}`);
+
+  try {
+    const db = await connectDB();
+    const users = db.collection('users');
+
+    const result = await users.updateOne(
+      { id: String(userId) },
+      { $set: { avatar: filePath } }
+    );
+
+    if (result.matchedCount === 0) {
+      console.warn(`User not found in DB: ${userId}`);
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      message: 'Avatar uploaded and database updated successfully',
+      path: filePath
+    });
+  } catch (err) {
+    console.error('Failed to update user avatar in MongoDB:', err);
+    res.status(500).json({ error: 'Database update failed' });
+  }
 });
 
 module.exports = router;

@@ -16,11 +16,13 @@ import Peer from 'peerjs';
     </div>
 
     <div class="control-panel">
-      <p *ngIf="!myPeerId">Connecting to PeerJS...</p>
+      <p *ngIf="!myPeerId">Connecting to PeerJS server...</p>
       <p *ngIf="myPeerId"><strong>Your Peer ID:</strong> {{ myPeerId }}</p>
 
       <input [(ngModel)]="remotePeerId" placeholder="Enter Remote Peer ID" />
       <button (click)="call()">Call</button>
+
+      <p class="status" [ngClass]="statusClass">{{ statusMessage }}</p>
     </div>
   `,
   styles: [`
@@ -43,6 +45,12 @@ import Peer from 'peerjs';
       padding: 6px;
       margin-right: 5px;
     }
+    .status {
+      margin-top: 10px;
+      font-weight: 500;
+    }
+    .status.ok { color: green; }
+    .status.error { color: red; }
   `]
 })
 export class VideoChatComponent implements OnInit, OnDestroy {
@@ -55,16 +63,28 @@ export class VideoChatComponent implements OnInit, OnDestroy {
   localStream!: MediaStream;
   callRef: any;
 
+  statusMessage = 'Connecting...';
+  statusClass = '';
+
   async ngOnInit() {
     this.peer = new Peer({
       host: 'localhost',
       port: 3001,
-      path: '/peerjs'
+      path: '/peerjs',
+      debug: 3
     });
 
     this.peer.on('open', id => {
       this.myPeerId = id;
+      this.statusMessage = 'Connected to PeerJS server';
+      this.statusClass = 'ok';
       console.log('My Peer ID:', id);
+    });
+
+    this.peer.on('error', err => {
+      console.error('PeerJS Error:', err);
+      this.statusMessage = 'PeerJS connection failed (' + err.type + ')';
+      this.statusClass = 'error';
     });
 
     this.peer.on('call', async call => {
@@ -78,23 +98,32 @@ export class VideoChatComponent implements OnInit, OnDestroy {
       });
 
       this.callRef = call;
+      this.statusMessage = 'In Call with ' + call.peer;
     });
   }
 
   async call() {
-    if (!this.remotePeerId.trim()) return alert('Please enter a Peer ID');
+    if (!this.remotePeerId.trim()) return alert('Please enter a Peer ID first.');
     this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
     this.myVideo.nativeElement.srcObject = this.localStream;
 
     const call = this.peer.call(this.remotePeerId, this.localStream);
     this.callRef = call;
+
     call.on('stream', remoteStream => {
       this.remoteVideo.nativeElement.srcObject = remoteStream;
     });
+
+    call.on('close', () => {
+      this.statusMessage = 'Call ended';
+    });
+
+    this.statusMessage = 'Calling ' + this.remotePeerId + '...';
   }
 
   ngOnDestroy() {
     if (this.callRef) this.callRef.close();
     if (this.localStream) this.localStream.getTracks().forEach(t => t.stop());
+    if (this.peer) this.peer.destroy();
   }
 }

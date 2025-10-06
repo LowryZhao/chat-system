@@ -30,27 +30,19 @@ export class ProfileComponent implements OnInit {
 
     const fd = new FormData();
     fd.append('avatar', this.file);
+    fd.append('userId', this.user.id);
 
     this.http.post<{ path: string }>('http://localhost:3000/api/upload/avatar', fd)
       .subscribe({
         next: ({ path }) => {
-          this.http.post('http://localhost:3000/api/users/update-avatar', {
-            userId: this.user.id,
-            avatarPath: path
-          }).subscribe({
-            next: () => {
-              this.user.avatar = path;
-              localStorage.setItem('user', JSON.stringify(this.user));
-              alert('Avatar updated successfully!');
-              this.uploading = false;
-            },
-            error: () => {
-              alert('Failed to update avatar in database.');
-              this.uploading = false;
-            }
-          });
+          this.user.avatar = path;
+          localStorage.setItem('user', JSON.stringify(this.user));
+
+          alert('Avatar updated successfully!');
+          this.uploading = false;
         },
-        error: () => {
+        error: (err) => {
+          console.error('Upload failed:', err);
           alert('Upload failed. Please try again.');
           this.uploading = false;
         }

@@ -55,7 +55,7 @@ io.on('connection', (socket) => {
 
   socket.on('joinChannel', async ({ channelId, username }) => {
     socket.join(channelId);
-    console.log(`👥 ${username} joined channel ${channelId}`);
+    console.log(`${username} joined channel ${channelId}`);
 
     const messages = await db.collection('messages')
       .find({ channelId })
@@ -102,12 +102,14 @@ server.listen(PORT, () => {
 const peerApp = express();
 peerApp.use(cors(corsOptions));
 
-const peerServer = ExpressPeerServer(http.createServer(peerApp), {
-  path: '/peerjs',
+const peerHttp = http.createServer(peerApp);
+const peerServer = ExpressPeerServer(peerHttp, {
+  path: '/', 
   debug: true
 });
 
 peerApp.use('/peerjs', peerServer);
-peerApp.listen(3001, () =>
-  console.log('PeerJS server running on http://localhost:3001/peerjs')
-);
+
+peerHttp.listen(3001, () => {
+  console.log('PeerJS server running on http://localhost:3001/peerjs');
+});

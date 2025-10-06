@@ -5,6 +5,7 @@ import { ChannelListComponent } from './components/channel-list/channel-list';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard';
 import { AuthGuard } from './guards/auth.guard';
 import { ProfileComponent } from './components/profile/profile.component';
+import { VideoChatComponent } from './components/video-chat/video-chat';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -15,4 +16,5 @@ export const routes: Routes = [
   { path: 'video', loadComponent: () => import('./components/video-chat/video-chat').then(m => m.VideoChatComponent) },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'profile', component: ProfileComponent },
+  { path: 'video', component: VideoChatComponent },
 ];

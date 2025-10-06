@@ -1,5 +1,9 @@
 <h3>Channel: {{ channelId }}</h3>
 
+<div class="chat-actions">
+  <button (click)="goToVideoChat()" class="video-btn">Video Chat</button>
+</div>
+
 <div #scrollContainer class="chat-box">
   <div *ngFor="let msg of messages">
 

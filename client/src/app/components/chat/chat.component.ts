@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 import { ChatService } from '../../services/chat.service';
 import { AuthService } from '../../services/auth';
@@ -27,7 +28,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   constructor(
     private chat: ChatService,
     private auth: AuthService,
-    private http: HttpClient
+    private http: HttpClient,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -141,5 +143,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
       }, 50);
     } catch {}
+  }
+
+  goToVideoChat() {
+  this.router.navigate(['/video']);
+
   }
 }
