@@ -58,7 +58,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     this.peer = new Peer({
       host: 'localhost',
-      port: 3000,
+      port: 3001,
       path: '/peerjs'
     });
 

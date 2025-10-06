@@ -17,20 +17,13 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: 'http://localhost:4200',
-    methods: ['GET', 'POST']
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type'],
+    credentials: true
   }
 });
 
-const peerServer = ExpressPeerServer(server, {
-  path: '/',     
-  debug: true
-});
-app.use('/peerjs', peerServer);
-
 const PORT = 3000;
-
-app.use(cors());
-app.use(express.json());
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -39,7 +32,16 @@ app.use('/api/users', userRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/channels', channelRoutes);
 
+app.use(cors());
+app.use(express.json());
+
 app.get('/', (req, res) => res.send('Chat System API + Socket.IO + PeerJS + Image Support'));
+
+let db;
+(async () => {
+  db = await connectDB();
+  console.log('MongoDB Connected');
+})();
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
@@ -48,7 +50,6 @@ io.on('connection', (socket) => {
     socket.join(channelId);
     console.log(`👥 ${username} joined channel ${channelId}`);
 
-    const db = await connectDB();
     const messages = await db.collection('messages')
       .find({ channelId })
       .sort({ timestamp: -1 })
@@ -61,8 +62,6 @@ io.on('connection', (socket) => {
 
   socket.on('chatMessage', async (data) => {
     const { channelId, userId, username, message, imageUrl } = data;
-    const db = await connectDB();
-
     const user = await db.collection('users').findOne({ id: String(userId) });
     const avatar = user?.avatar || '/uploads/default-avatar.png';
 
@@ -85,12 +84,17 @@ io.on('connection', (socket) => {
     socket.to(channelId).emit('userLeft', { username });
   });
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
-  });
+  socket.on('disconnect', () => console.log('User disconnected:', socket.id));
 });
 
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`PeerJS server available at http://localhost:${PORT}/peerjs`);
 });
+
+const peerApp = express();
+const peerServer = ExpressPeerServer(http.createServer(peerApp), {
+  path: '/',
+  debug: true
+});
+peerApp.use('/', peerServer);
+peerApp.listen(3001, () => console.log('PeerJS server running on port 3001'));
