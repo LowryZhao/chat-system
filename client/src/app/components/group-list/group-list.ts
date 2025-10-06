@@ -14,6 +14,7 @@ import { AuthService } from '../../services/auth';
 export class GroupListComponent implements OnInit {
   myGroups: Group[] = [];
   allGroups: Group[] = [];
+  targetUserId: string = '';
 
   constructor(
     public authService: AuthService,
@@ -25,21 +26,46 @@ export class GroupListComponent implements OnInit {
   }
 
   private loadData() {
-    const userId = this.authService.getUser().id;
+    const userId = this.authService.getUser()?.id;
+    if (!userId) return;
 
-    this.groupService.getUserGroups(userId).subscribe(gs => this.myGroups = gs);
-    
-    this.groupService.getAllGroups().subscribe(gs => this.allGroups = gs);
+    this.groupService.getUserGroups(userId).subscribe({
+      next: (gs) => (this.myGroups = gs || []),
+      error: () => (this.myGroups = [])
+    });
+
+    if (this.authService.hasRole('group_admin') || this.authService.hasRole('super_admin')) {
+      this.groupService.getAllGroups().subscribe({
+        next: (gs) => (this.allGroups = gs || []),
+        error: () => (this.allGroups = [])
+      });
+    }
   }
 
-  join(groupId: string) {
-    const userId = this.authService.getUser().id;
-    this.groupService.joinGroup(groupId, userId).subscribe(() => this.loadData());
+  addUserToGroup(groupId: string, userId: string) {
+    const adminId = this.authService.getUser().id;
+    if (!this.authService.hasRole('group_admin') && !this.authService.hasRole('super_admin')) return;
+
+    this.groupService.addUserToGroup(groupId, adminId, userId).subscribe({
+      next: () => {
+        alert('User added to group successfully');
+        this.loadData();
+      },
+      error: (err) => alert(err.error?.error || 'Failed to add user')
+    });
   }
 
-  leave(groupId: string) {
-    const userId = this.authService.getUser().id;
-    this.groupService.leaveGroup(groupId, userId).subscribe(() => this.loadData());
+  removeUserFromGroup(groupId: string, userId: string) {
+    const adminId = this.authService.getUser().id;
+    if (!this.authService.hasRole('group_admin') && !this.authService.hasRole('super_admin')) return;
+
+    this.groupService.removeUserFromGroup(groupId, adminId, userId).subscribe({
+      next: () => {
+        alert('User removed from group');
+        this.loadData();
+      },
+      error: (err) => alert(err.error?.error || 'Failed to remove user')
+    });
   }
 
   isMember(group: Group): boolean {

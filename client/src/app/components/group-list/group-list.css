@@ -1,0 +1,19 @@
+h2, h3 {
+  margin-top: 1rem;
+}
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+li {
+  margin-bottom: 8px;
+}
+button {
+  margin-left: 6px;
+  padding: 4px 8px;
+}
+input {
+  margin-bottom: 8px;
+  margin-left: 6px;
+  padding: 4px;
+}

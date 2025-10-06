@@ -29,17 +29,6 @@ export class ChannelListComponent implements OnInit {
     this.loadChannels();
   }
 
-  private fetchChannelsByGroup(groupId: string) {
-    if (!groupId) {
-      this.channels = [];
-      return;
-    }
-    this.channelService.getGroupChannels(groupId).subscribe({
-      next: (chs: Channel[]) => (this.channels = chs || []),
-      error: () => (this.channels = [])
-    });
-  }
-
   loadChannels() {
     const userId = this.authService.getUser()?.id;
     if (!userId) {
@@ -53,7 +42,7 @@ export class ChannelListComponent implements OnInit {
         if (!this.selectedGroupId && this.myGroups.length > 0) {
           this.selectedGroupId = this.myGroups[0].id;
         }
-        this.fetchChannelsByGroup(this.selectedGroupId);
+        this.fetchChannelsByGroup(this.selectedGroupId, userId);
       },
       error: () => {
         this.myGroups = [];
@@ -62,30 +51,43 @@ export class ChannelListComponent implements OnInit {
     });
   }
 
+  private fetchChannelsByGroup(groupId: string, userId: string) {
+    if (!groupId) {
+      this.channels = [];
+      return;
+    }
+    this.channelService.getGroupChannels(groupId, userId).subscribe({
+      next: (chs: Channel[]) => (this.channels = chs || []),
+      error: () => (this.channels = [])
+    });
+  }
+
   onGroupChange() {
-    this.fetchChannelsByGroup(this.selectedGroupId);
+    const userId = this.authService.getUser().id;
+    this.fetchChannelsByGroup(this.selectedGroupId, userId);
   }
 
   createChannel() {
-    if (!this.newChannelName || !this.authService.hasRole('group_admin')) return;
-    const userId = this.authService.getUser().id;
-    if (!this.selectedGroupId) return;
+    if (!this.newChannelName) return;
+    const user = this.authService.getUser();
+    if (!user?.id || !this.authService.hasRole('group_admin')) return;
 
     this.channelService
-      .createChannel(this.newChannelName, this.selectedGroupId, userId)
-      .subscribe(() => {
-        this.newChannelName = '';
-        this.fetchChannelsByGroup(this.selectedGroupId);
+      .createChannel(this.newChannelName, this.selectedGroupId, user.id)
+      .subscribe({
+        next: () => {
+          this.newChannelName = '';
+          this.fetchChannelsByGroup(this.selectedGroupId, user.id);
+        },
+        error: (err) => alert(err.error?.error || 'Failed to create channel')
       });
-  }
-
-  joinChannel(channelId: string) {
-    const userId = this.authService.getUser().id;
-    this.channelService.joinChannel(channelId, userId).subscribe(() => this.fetchChannelsByGroup(this.selectedGroupId));
   }
 
   leaveChannel(channelId: string) {
     const userId = this.authService.getUser().id;
-    this.channelService.leaveChannel(channelId, userId).subscribe(() => this.fetchChannelsByGroup(this.selectedGroupId));
+    this.channelService.leaveChannel(channelId, userId).subscribe({
+      next: () => this.fetchChannelsByGroup(this.selectedGroupId, userId),
+      error: () => alert('Failed to leave channel')
+    });
   }
 }

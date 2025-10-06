@@ -1,4 +1,5 @@
-const { users } = require('../models/data');
+const data = require('../models/data');
+const { users } = data;
 
 exports.login = (req, res) => {
   const { username, password } = req.body;
@@ -47,6 +48,9 @@ exports.createUserByAdmin = (req, res) => {
   };
 
   users.push(newUser);
+
+  data.saveData();
+  
   res.json({ message: 'User created successfully', user: newUser });
 };
 
@@ -60,5 +64,8 @@ exports.removeUser = (req, res) => {
   if (index === -1) return res.status(404).json({ error: 'User not found' });
 
   const removed = users.splice(index, 1);
+
+  data.saveData();
+
   res.json({ message: 'User removed successfully', removed });
 };

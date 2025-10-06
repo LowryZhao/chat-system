@@ -5,7 +5,9 @@
       "username": "super",
       "password": "123",
       "email": "super@admin.com",
-      "roles": ["super_admin"],
+      "roles": [
+        "super_admin"
+      ],
       "groups": []
     },
     {
@@ -13,7 +15,9 @@
       "username": "user1",
       "password": "123",
       "email": "user1@example.com",
-      "roles": ["user"],
+      "roles": [
+        "user"
+      ],
       "groups": []
     },
     {
@@ -21,7 +25,9 @@
       "username": "user2",
       "password": "123",
       "email": "user2@example.com",
-      "roles": ["user"],
+      "roles": [
+        "user"
+      ],
       "groups": []
     },
     {
@@ -29,7 +35,9 @@
       "username": "groupadmin",
       "password": "123",
       "email": "groupadmin@example.com",
-      "roles": ["group_admin"],
+      "roles": [
+        "group_admin"
+      ],
       "groups": []
     }
   ],
@@ -37,16 +45,32 @@
     {
       "id": "1",
       "name": "Group 1",
-      "admins": ["1", "4"],
-      "members": ["1", "2"],
-      "channels": ["1", "2"]
+      "admins": [
+        "1",
+        "4"
+      ],
+      "members": [
+        "1",
+        "2"
+      ],
+      "channels": [
+        "1",
+        "2"
+      ]
     },
     {
       "id": "2",
       "name": "Group 2",
-      "admins": ["1"],
-      "members": ["1", "3"],
-      "channels": ["3"]
+      "admins": [
+        "1"
+      ],
+      "members": [
+        "1",
+        "3"
+      ],
+      "channels": [
+        "3"
+      ]
     }
   ],
   "channels": [
@@ -54,19 +78,27 @@
       "id": "1",
       "name": "General",
       "groupId": "1",
-      "members": ["1", "2"]
+      "members": [
+        "1",
+        "2"
+      ]
     },
     {
       "id": "2",
       "name": "Random",
       "groupId": "1",
-      "members": ["1"]
+      "members": [
+        "1"
+      ]
     },
     {
       "id": "3",
       "name": "Announcements",
       "groupId": "2",
-      "members": ["1", "3"]
+      "members": [
+        "1",
+        "3"
+      ]
     }
   ]
 }

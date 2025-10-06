@@ -1,19 +1,33 @@
 <h2>My Groups</h2>
-<ul>
+
+<ul *ngIf="myGroups.length > 0; else noGroups">
   <li *ngFor="let g of myGroups">
-    {{ g.name }}
-    <button (click)="leave(g.id)">Leave</button>
+    {{ g.name }} ({{ g.members.length || 0 }} members)
   </li>
 </ul>
-<p *ngIf="myGroups.length === 0">You are not in any groups yet.</p>
+
+<ng-template #noGroups>
+  <p>You are not in any groups yet.</p>
+</ng-template>
 
 <hr />
 
-<h3>Available Groups</h3>
-<ul>
-  <li *ngFor="let g of allGroups">
-    {{ g.name }}
-    <button *ngIf="!isMember(g)" (click)="join(g.id)">Join</button>
-    <span *ngIf="isMember(g)">&nbsp;✓ Joined</span>
-  </li>
-</ul>
+<div *ngIf="authService.hasRole('group_admin') || authService.hasRole('super_admin')">
+  <h3>All Groups (Admin View)</h3>
+
+  <label>User ID to manage:</label>
+  <input [(ngModel)]="targetUserId" placeholder="Enter user ID" />
+
+  <ul *ngIf="allGroups.length > 0; else noAllGroups">
+    <li *ngFor="let g of allGroups">
+      <strong>{{ g.name }}</strong>
+      <span>({{ g.members.length || 0 }} members)</span>
+      <button (click)="addUserToGroup(g.id, targetUserId)">Add User</button>
+      <button (click)="removeUserFromGroup(g.id, targetUserId)">Remove User</button>
+    </li>
+  </ul>
+
+  <ng-template #noAllGroups>
+    <p>No groups found.</p>
+  </ng-template>
+</div>

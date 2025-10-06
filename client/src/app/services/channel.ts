@@ -31,6 +31,12 @@ export class ChannelService {
     });
   }
 
+  deleteChannel(channelId: string, adminId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${channelId}`, {
+      body: { adminId }
+    });
+  }
+
   saveChannels(channels: Channel[]) {
     localStorage.setItem('channels', JSON.stringify(channels));
   }

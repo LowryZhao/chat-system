@@ -23,10 +23,13 @@ export class AdminDashboardComponent implements OnInit {
 
   groupName = '';
   targetGroupId = '';
+  channelGroupId = '';
   targetUserId = '';
+  deleteGroupId = '';
+
   channelName = '';
   targetChannelId = '';
-  deleteGroupId = '';
+  deleteChannelId = ''; 
 
   constructor(
     public authService: AuthService,
@@ -36,7 +39,6 @@ export class AdminDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit() {}
-
 
   createUser() {
     const adminId = this.authService.getUser().id;
@@ -55,7 +57,6 @@ export class AdminDashboardComponent implements OnInit {
       error: (err) => alert(err.error?.error || 'Failed to remove user')
     });
   }
-
 
   createGroup() {
     const adminId = this.authService.getUser().id;
@@ -81,9 +82,17 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
+  deleteGroup() {
+    const adminId = this.authService.getUser().id;
+    this.groupService.deleteGroup(this.deleteGroupId, adminId).subscribe({
+      next: () => alert('Group deleted successfully'),
+      error: (err) => alert(err.error?.error || 'Failed to delete group')
+    });
+  }
+
   createChannel() {
     const adminId = this.authService.getUser().id;
-    this.channelService.createChannel(this.channelName, this.targetGroupId, adminId).subscribe({
+    this.channelService.createChannel(this.channelName, this.channelGroupId, adminId).subscribe({
       next: () => alert('Channel created successfully'),
       error: (err) => alert(err.error?.error || 'Failed to create channel')
     });
@@ -105,11 +114,11 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  deleteGroup() {
+  deleteChannel() {
     const adminId = this.authService.getUser().id;
-    this.groupService.deleteGroup(this.deleteGroupId, adminId).subscribe({
-      next: () => alert('Group deleted successfully'),
-      error: (err) => alert(err.error?.error || 'Failed to delete group')
+    this.channelService.deleteChannel(this.deleteChannelId, adminId).subscribe({
+      next: () => alert('Channel deleted successfully'),
+      error: (err) => alert(err.error?.error || 'Failed to delete channel')
     });
   }
 }

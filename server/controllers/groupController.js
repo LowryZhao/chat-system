@@ -1,4 +1,5 @@
-const { users, groups, channels } = require('../models/data');
+const data = require('../models/data');
+const { users, groups, channels } = data;
 
 function isGroupAdmin(userId, group) {
   return group.admins.includes(userId) || isSuperAdmin(userId);
@@ -26,10 +27,14 @@ exports.createGroup = (req, res) => {
 
   groups.push(newGroup);
 
-  if (!admin.groups.includes(newGroup.id)) {
-    admin.groups.push(newGroup.id);
+  const adminUser = users.find((u) => u.id === adminId);
+  if (adminUser && !adminUser.groups.includes(newGroup.id)) {
+    adminUser.groups.push(newGroup.id);
   }
 
+  data.saveData();
+
+  console.log(`New group created: ${name} by user ${adminId}`);
   return res.json(newGroup);
 };
 
@@ -57,6 +62,9 @@ exports.addUserToGroup = (req, res) => {
     user.groups.push(groupId);
   }
 
+  data.saveData();
+
+  console.log(`👥 User ${userId} added to group ${groupId}`);
   return res.json({ message: 'User added to group successfully', group });
 };
 
@@ -73,17 +81,14 @@ exports.removeUserFromGroup = (req, res) => {
 
   group.members = group.members.filter((id) => id !== userId);
 
-  channels.forEach(c => {
-    if (c.groupId === groupId) {
-      c.members = c.members.filter(id => id !== userId);
-    }
-  });
-
   const user = users.find((u) => u.id === userId);
   if (user) {
     user.groups = user.groups.filter((id) => id !== groupId);
   }
 
+  data.saveData();
+
+  console.log(`👤 User ${userId} removed from group ${groupId}`);
   return res.json({ message: 'User removed from group successfully', group });
 };
 
@@ -111,6 +116,9 @@ exports.deleteGroup = (req, res) => {
 
   groups.splice(index, 1);
 
+  data.saveData();
+
+  console.log(`Group ${groupId} deleted by ${adminId}`);
   return res.json({ message: 'Group deleted successfully' });
 };
 

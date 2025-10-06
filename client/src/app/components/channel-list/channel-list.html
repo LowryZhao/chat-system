@@ -3,11 +3,24 @@
 <label>
   Group:
   <select [(ngModel)]="selectedGroupId" (change)="onGroupChange()">
+    <option [value]="">-- Select Group --</option>
     <option *ngFor="let g of myGroups" [value]="g.id">{{ g.name }}</option>
   </select>
 </label>
 
-<ul>
-  <li *ngFor="let c of channels">{{ c.name }}</li>
+<ul *ngIf="channels.length > 0; else noChannels">
+  <li *ngFor="let c of channels">
+    {{ c.name }}
+    <button (click)="leaveChannel(c.id)" *ngIf="authService.isAuthenticated()">Leave</button>
+  </li>
 </ul>
-<p *ngIf="channels.length === 0">No channels in this group yet.</p>
+
+<ng-template #noChannels>
+  <p>No channels in this group yet.</p>
+</ng-template>
+
+<div *ngIf="authService.hasRole('group_admin')" class="create-section">
+  <h4>Create New Channel</h4>
+  <input [(ngModel)]="newChannelName" placeholder="Enter channel name" />
+  <button (click)="createChannel()">Create</button>
+</div>
