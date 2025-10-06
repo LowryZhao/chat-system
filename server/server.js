@@ -4,6 +4,7 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const { connectDB } = require('./db');
 const path = require('path');
+const { ExpressPeerServer } = require('peer');
 
 const uploadRoutes = require('./routes/uploadRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -12,12 +13,19 @@ const channelRoutes = require('./routes/channelRoutes');
 
 const app = express();
 const server = http.createServer(app);
+
 const io = new Server(server, {
   cors: {
     origin: 'http://localhost:4200',
     methods: ['GET', 'POST']
   }
 });
+
+const peerServer = ExpressPeerServer(server, {
+  path: '/',     
+  debug: true
+});
+app.use('/peerjs', peerServer);
 
 const PORT = 3000;
 
@@ -31,7 +39,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/channels', channelRoutes);
 
-app.get('/', (req, res) => res.send('Chat System API + Socket.IO + Image Support'));
+app.get('/', (req, res) => res.send('Chat System API + Socket.IO + PeerJS + Image Support'));
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
@@ -48,7 +56,6 @@ io.on('connection', (socket) => {
       .toArray();
 
     socket.emit('chatHistory', messages.reverse());
-
     socket.to(channelId).emit('userJoined', { username });
   });
 
@@ -70,8 +77,6 @@ io.on('connection', (socket) => {
     };
 
     await db.collection('messages').insertOne(newMsg);
-
-
     io.to(channelId).emit('chatMessage', newMsg);
   });
 
@@ -87,4 +92,5 @@ io.on('connection', (socket) => {
 
 server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`PeerJS server available at http://localhost:${PORT}/peerjs`);
 });
