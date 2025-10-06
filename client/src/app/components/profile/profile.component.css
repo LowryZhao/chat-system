@@ -1,0 +1,37 @@
+.profile-card {
+  text-align: center;
+  background: #fafafa;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 320px;
+  margin: 20px auto;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #ccc;
+  margin-bottom: 10px;
+}
+
+input[type="file"] {
+  display: block;
+  margin: 10px auto;
+}
+
+button {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:hover {
+  background-color: #0056b3;
+}

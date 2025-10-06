@@ -1,0 +1,12 @@
+<h2>My Profile</h2>
+
+<div class="profile-card">
+  <img [src]="avatarUrl" alt="avatar" class="avatar" />
+  <h4>{{ user?.username }}</h4>
+  <p>{{ user?.email }}</p>
+
+  <input type="file" (change)="pick($event)" />
+  <button (click)="upload()" [disabled]="uploading">
+    {{ uploading ? 'Uploading...' : 'Update Avatar' }}
+  </button>
+</div>

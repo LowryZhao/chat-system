@@ -114,4 +114,5 @@ exports.updateAvatar = async (req, res) => {
     console.error('UpdateAvatar error:', err);
     res.status(500).json({ error: 'Server error' });
   }
+
 };

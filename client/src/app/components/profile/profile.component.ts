@@ -5,32 +5,29 @@ import { AuthService } from '../../services/auth';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  template: `
-    <h3>Upload Avatar</h3>
-    <input type="file" (change)="pick($event)" />
-    <button (click)="upload()">Upload</button>
-
-    <div *ngIf="user?.avatar" style="margin-top:8px">
-      <img [src]="'http://localhost:3000' + user.avatar" width="100" height="100" style="border-radius:50%" />
-    </div>
-  `
+  templateUrl: './profile.component.html',
+  styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
   file: File | null = null;
   user: any;
+  uploading = false;
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 
   ngOnInit() {
+    console.log('ProfileComponent loaded');
     this.user = this.auth.getUser();
   }
 
-  pick(e: any) {
-    this.file = e.target.files?.[0] ?? null;
+  pick(event: any) {
+    this.file = event.target.files?.[0] ?? null;
   }
 
   upload() {
-    if (!this.file) return alert('Choose a file');
+    if (!this.file) return alert('Please select a file first.');
+    this.uploading = true;
+
     const fd = new FormData();
     fd.append('avatar', this.file);
 
@@ -44,12 +41,25 @@ export class ProfileComponent implements OnInit {
             next: () => {
               this.user.avatar = path;
               localStorage.setItem('user', JSON.stringify(this.user));
-              alert('Avatar updated');
+              alert('Avatar updated successfully!');
+              this.uploading = false;
             },
-            error: () => alert('Failed to update avatar')
+            error: () => {
+              alert('Failed to update avatar in database.');
+              this.uploading = false;
+            }
           });
         },
-        error: () => alert('Upload failed')
+        error: () => {
+          alert('Upload failed. Please try again.');
+          this.uploading = false;
+        }
       });
+  }
+
+  get avatarUrl() {
+    return this.user?.avatar
+      ? 'http://localhost:3000' + this.user.avatar
+      : 'http://localhost:3000/uploads/default-avatar.png';
   }
 }
