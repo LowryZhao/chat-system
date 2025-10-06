@@ -1,4 +1,4 @@
-<h3>Channel {{ channelId }}</h3>
+<h3>Channel: {{ channelId }}</h3>
 
 <div #scrollContainer class="chat-box">
   <div *ngFor="let msg of messages">
@@ -8,17 +8,39 @@
     </div>
 
     <div *ngIf="!msg.system" class="user-msg">
-      <img *ngIf="msg.avatar" [src]="'http://localhost:3000' + msg.avatar" class="avatar" />
-      <strong>{{ msg.username }}</strong>:
-      <span *ngIf="msg.message">{{ msg.message }}</span>
-      <img *ngIf="msg.imageUrl" [src]="'http://localhost:3000' + msg.imageUrl" class="chat-img" />
-      <small *ngIf="msg.timestamp">({{ msg.timestamp | date:'shortTime' }})</small>
+      <img
+        *ngIf="msg.avatar"
+        [src]="'http://localhost:3000' + msg.avatar"
+        alt="avatar"
+        class="avatar"
+      />
+
+      <div class="message-content">
+        <strong class="username">{{ msg.username }}</strong>
+        <span *ngIf="msg.message" class="text">{{ msg.message }}</span>
+
+        <img
+          *ngIf="msg.imageUrl"
+          [src]="'http://localhost:3000' + msg.imageUrl"
+          alt="image message"
+          class="chat-img"
+        />
+
+        <small *ngIf="msg.timestamp" class="timestamp">
+          {{ msg.timestamp | date: 'shortTime' }}
+        </small>
+      </div>
     </div>
   </div>
 </div>
 
 <div class="chat-input">
-  <input [(ngModel)]="text" placeholder="Type message..." (keydown.enter)="send()" />
-  <input type="file" (change)="pickImage($event)" />
-  <button (click)="send()">Send</button>
+  <input
+    [(ngModel)]="text"
+    placeholder="Type your message..."
+    (keydown.enter)="send()"
+    class="message-input"
+  />
+  <input type="file" (change)="pickImage($event)" class="file-input" />
+  <button (click)="send()" class="send-btn">Send</button>
 </div>

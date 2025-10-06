@@ -1,9 +1,11 @@
 import { Component, Input, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+
 import { ChatService } from '../../services/chat.service';
 import { AuthService } from '../../services/auth';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-chat',
@@ -18,6 +20,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   text = '';
   imageFile: File | null = null;
   me!: { id: string; username: string; avatar?: string };
+  private subscriptions: Subscription[] = [];
 
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
@@ -29,32 +32,50 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   ngOnInit() {
     this.me = this.auth.getUser();
+    if (!this.me?.id || !this.channelId) return;
+
     this.chat.joinChannel(this.channelId, this.me.id, this.me.username);
 
-    this.chat.onHistory().subscribe(h => {
-      this.messages = h || [];
-      this.scrollToBottom();
-    });
+    this.subscriptions.push(
+      this.chat.onHistory().subscribe((h) => {
+        this.messages = h || [];
+        this.scrollToBottom();
+      })
+    );
 
-    this.chat.onMessage().subscribe(m => {
-      this.messages.push(m);
-      this.scrollToBottom();
-    });
+    this.subscriptions.push(
+      this.chat.onMessage().subscribe((m) => {
+        this.messages.push(m);
+        this.scrollToBottom();
+      })
+    );
 
-    this.chat.onUserJoined().subscribe(({ username }) => {
-      this.messages.push({ system: true, message: `${username} joined the channel.` });
-      this.scrollToBottom();
-    });
+    this.subscriptions.push(
+      this.chat.onUserJoined().subscribe(({ username }) => {
+        this.messages.push({
+          system: true,
+          message: `${username} joined the channel.`
+        });
+        this.scrollToBottom();
+      })
+    );
 
-    this.chat.onUserLeft().subscribe(({ username }) => {
-      this.messages.push({ system: true, message: `${username} left the channel.` });
-      this.scrollToBottom();
-    });
+    this.subscriptions.push(
+      this.chat.onUserLeft().subscribe(({ username }) => {
+        this.messages.push({
+          system: true,
+          message: `${username} left the channel.`
+        });
+        this.scrollToBottom();
+      })
+    );
 
-    this.chat.onSystem().subscribe(({ message }) => {
-      this.messages.push({ system: true, message });
-      this.scrollToBottom();
-    });
+    this.subscriptions.push(
+      this.chat.onSystem().subscribe(({ message }) => {
+        this.messages.push({ system: true, message });
+        this.scrollToBottom();
+      })
+    );
   }
 
   ngAfterViewChecked() {
@@ -62,7 +83,10 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   ngOnDestroy() {
-    this.chat.leaveChannel(this.channelId, this.me.username);
+    if (this.me?.username && this.channelId) {
+      this.chat.leaveChannel(this.channelId, this.me.username);
+    }
+    this.subscriptions.forEach((s) => s.unsubscribe());
   }
 
   send() {
@@ -72,35 +96,50 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       const fd = new FormData();
       fd.append('image', this.imageFile);
 
-      this.http.post<{ path: string }>('http://localhost:3000/api/upload/image', fd)
+      this.http
+        .post<{ path: string }>('http://localhost:3000/api/upload/image', fd)
         .subscribe({
           next: ({ path }) => {
-            this.chat.sendMessage(
-              this.channelId,
-              this.me.id,
-              this.me.username,
-              null,
-              path
-            );
-            this.imageFile = null;
+            if (path) {
+              this.chat.sendMessage(
+                this.channelId,
+                this.me.id,
+                this.me.username,
+                null,
+                path
+              );
+              this.imageFile = null;
+            } else {
+              alert('Upload failed: no path returned.');
+            }
           },
           error: () => alert('Image upload failed')
         });
-    } else {
-      this.chat.sendMessage(this.channelId, this.me.id, this.me.username, this.text.trim());
     }
 
-    this.text = '';
+    if (this.text.trim()) {
+      this.chat.sendMessage(
+        this.channelId,
+        this.me.id,
+        this.me.username,
+        this.text.trim()
+      );
+      this.text = '';
+    }
   }
 
-  pickImage(e: any) {
-    this.imageFile = e.target.files?.[0] ?? null;
+  pickImage(event: any) {
+    this.imageFile = event.target.files?.[0] ?? null;
   }
 
   private scrollToBottom() {
     try {
-      this.scrollContainer.nativeElement.scrollTop =
-        this.scrollContainer.nativeElement.scrollHeight;
+      setTimeout(() => {
+        if (this.scrollContainer?.nativeElement) {
+          this.scrollContainer.nativeElement.scrollTop =
+            this.scrollContainer.nativeElement.scrollHeight;
+        }
+      }, 50);
     } catch {}
   }
 }
