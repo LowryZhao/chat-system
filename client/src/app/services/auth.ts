@@ -22,21 +22,19 @@ export class AuthService {
     localStorage.setItem(this.userKey, JSON.stringify(user));
   }
 
-login(username: string, password: string): Observable<any> {
-  return this.http.post<any>(`${this.apiUrl}/login`, { username, password })
-    .pipe(tap(u => this.saveUser(u)));
-}
+  login(username: string, password: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, { username, password })
+      .pipe(tap(u => this.saveUser(u)));
+  }
 
-register(username: string, email: string, password: string): Observable<any> {
-  return this.http.post<any>(`${this.apiUrl}/register`, { username, email, password });
-}
-
+  register(username: string, email: string, password: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/register`, { username, email, password });
+  }
 
   logout() {
-  this.user = null;
-  localStorage.removeItem('user');
-  } 
-
+    this.user = null;
+    localStorage.removeItem(this.userKey);
+  }
 
   getUser() {
     return this.user || {};
@@ -48,5 +46,17 @@ register(username: string, email: string, password: string): Observable<any> {
 
   hasRole(role: string): boolean {
     return !!this.user?.roles?.includes(role);
+  }
+
+  isSuperAdmin(): boolean {
+    return this.hasRole('super_admin');
+  }
+
+  isGroupAdmin(): boolean {
+    return this.hasRole('group_admin');
+  }
+
+  isUser(): boolean {
+    return this.hasRole('user');
   }
 }
