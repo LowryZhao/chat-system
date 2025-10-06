@@ -5,19 +5,22 @@ import { ChannelService } from '../../services/channel';
 import { AuthService } from '../../services/auth';
 import { GroupService } from '../../services/group';
 import { Channel } from '../../models/channel.model';
+import { ChatComponent } from '../chat/chat.component';
 
 @Component({
   selector: 'app-channel-list',
   templateUrl: './channel-list.html',
   styleUrls: ['./channel-list.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, ChatComponent]
 })
 export class ChannelListComponent implements OnInit {
   channels: Channel[] = [];
   newChannelName = '';
   selectedGroupId = '';
   myGroups: { id: string; name: string; members?: string[] }[] = [];
+
+  selectedChannelId = '';
 
   constructor(
     public authService: AuthService,
@@ -65,6 +68,7 @@ export class ChannelListComponent implements OnInit {
   onGroupChange() {
     const userId = this.authService.getUser().id;
     this.fetchChannelsByGroup(this.selectedGroupId, userId);
+    this.selectedChannelId = '';
   }
 
   createChannel() {
@@ -89,5 +93,9 @@ export class ChannelListComponent implements OnInit {
       next: () => this.fetchChannelsByGroup(this.selectedGroupId, userId),
       error: () => alert('Failed to leave channel')
     });
+  }
+
+  openChat(channelId: string) {
+    this.selectedChannelId = channelId;
   }
 }

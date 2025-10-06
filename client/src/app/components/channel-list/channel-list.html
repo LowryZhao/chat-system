@@ -12,6 +12,7 @@
   <li *ngFor="let c of channels">
     {{ c.name }}
     <button (click)="leaveChannel(c.id)" *ngIf="authService.isAuthenticated()">Leave</button>
+    <button (click)="openChat(c.id)" *ngIf="authService.isAuthenticated()">Open Chat</button>
   </li>
 </ul>
 
@@ -24,3 +25,8 @@
   <input [(ngModel)]="newChannelName" placeholder="Enter channel name" />
   <button (click)="createChannel()">Create</button>
 </div>
+
+<app-chat
+  *ngIf="selectedChannelId"
+  [channelId]="selectedChannelId">
+</app-chat>
