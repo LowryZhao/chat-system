@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>README.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="chat-system--phase-2">Chat System — Phase 2</h1>
+<p><strong>Student:</strong> Lowry Zhao<br>
+<strong>Student ID:</strong> S5226106</p>
+<hr>
+<h2 id="git-repository-organisation">Git Repository Organisation</h2>
+<h3 id="repository-structure">Repository Structure</h3>
+<ul>
+<li><strong>client</strong>： Used to store Angular frontend components, the UI components (components), data models (models), Business logic (services), Angular routes (app.routes.ts) and E2E testing(cypress).</li>
+<li>use <code>ng serve</code> to start.</li>
+<li><strong>server</strong>：  Used to store backend files, mainly including Rest API end points (routes), Business logic (controllers), MongoDB connection (db.js), Main server + Socket.IO (server.js), Uploaded avatars/images (uploads) and Jest unit tests (test).</li>
+<li>use <code>node sever.js</code> to start.</li>
+<li><strong>Git</strong>: Because only one main branch was used, uploading to GitHub only used <code>git add .</code>, <code>git commit -m &quot; &quot;</code>, <code>git push</code>.</li>
+</ul>
+<h3 id="version-control-strategy">Version Control Strategy</h3>
+<ul>
+<li><code>main</code> — stable release branch</li>
+<li>All code uploaded to Git is tested and validated locally before being uploaded to Github.</li>
+<li>Each commit message is descriptive (<code>video chat</code>, <code>fix send message</code>)</li>
+<li><code>.gitignore</code> excludes <code>node_modules</code>, <code>.env</code>, build folders, and uploads.</li>
+</ul>
+<hr>
+<h2 id="data-structures">Data Structures</h2>
+<h3 id="server-side-mongodb-collections">Server-side (MongoDB Collections)</h3>
+<table>
+<thead>
+<tr>
+<th>Collection</th>
+<th>Fields</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>users</code></td>
+<td><code>{ id, username, email, password, roles[], groups[], avatar }</code></td>
+<td>Stores users, roles (<code>super_admin</code>, <code>group_admin</code>, <code>user</code>), and avatar paths</td>
+</tr>
+<tr>
+<td><code>groups</code></td>
+<td><code>{ id, name, admins[], members[], channels[] }</code></td>
+<td>Group structure with admins and members</td>
+</tr>
+<tr>
+<td><code>channels</code></td>
+<td><code>{ id, name, groupId, members[] }</code></td>
+<td>Channels within groups</td>
+</tr>
+<tr>
+<td><code>messages</code></td>
+<td><code>{ channelId, userId, username, avatar, message, imageUrl, timestamp }</code></td>
+<td>Chat messages with text or image</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>roles</strong> are used for permission control (super add, group add, user).</li>
+<li><strong>Groups</strong> is a list of group IDs that users join</li>
+<li><strong>Avatar</strong> is the path to the avatar file, which is physically stored on server/uploads/avatars/, and the path is stored in the database.</li>
+<li>Groups and channels are associated through channels ID.</li>
+<li>Display the group name and number of members in the front-end <strong>GroupListComponent</strong>.</li>
+<li><strong>groupId</strong> represents the group to which the channel belongs.</li>
+<li><strong>members</strong> is a list of users who can access the channel.</li>
+<li>The front-end implements real-time channel joining and leaving (joinChannel/leaveChannel) through Socket.IO.</li>
+</ul>
+<hr>
+<h2 id="api-routes">API Routes</h2>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Method</th>
+<th>Parameters</th>
+<th>Return</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/api/users/login</code></td>
+<td>POST</td>
+<td><code>{ username, password }</code></td>
+<td><code>User object</code></td>
+<td>Authenticate login</td>
+</tr>
+<tr>
+<td><code>/api/users/register</code></td>
+<td>POST</td>
+<td><code>{ username, email, password }</code></td>
+<td><code>User object</code></td>
+<td>Register user</td>
+</tr>
+<tr>
+<td><code>/api/users/update-avatar</code></td>
+<td>POST</td>
+<td><code>{ userId, avatarPath }</code></td>
+<td><code>{ message, avatar }</code></td>
+<td>Update avatar</td>
+</tr>
+<tr>
+<td><code>/api/upload/avatar</code></td>
+<td>POST</td>
+<td>FormData(<code>avatar</code>)</td>
+<td><code>{ path }</code></td>
+<td>Upload profile avatar</td>
+</tr>
+<tr>
+<td><code>/api/upload/image</code></td>
+<td>POST</td>
+<td>FormData(<code>image</code>)</td>
+<td><code>{ path }</code></td>
+<td>Upload chat image</td>
+</tr>
+<tr>
+<td><code>/socket.io</code></td>
+<td>WebSocket</td>
+<td>—</td>
+<td>—</td>
+<td>Real-time communication</td>
+</tr>
+<tr>
+<td><code>/peerjs</code></td>
+<td>PeerJS</td>
+<td>—</td>
+<td>—</td>
+<td>Peer-to-peer video signaling</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="client-server-responsibilities">Client-Server Responsibilities</h2>
+<ul>
+<li><strong>Server</strong>: Handling data persistence (MongoDB), authentication (JWT), file upload (Express multer), and real-time broadcasting (Socket. IO). Provide REST API to return JSON and serve static files (/uploads).</li>
+<li><strong>Client</strong>: Manage UI rendering (Angular components), user interaction (forms), local state (NgRx or services), HTTP requests (FHIR), and WebSocket subscriptions.
+This ensures that the server is stateless and the client is responsive.</li>
+</ul>
+<hr>
+<h2 id="angular-architecture">Angular Architecture</h2>
+<h3 id="components">Components</h3>
+<ul>
+<li>LoginComponent: Process login/registration forms.</li>
+<li>GroupListComponent: Display user group list</li>
+<li>ChannelListComponent: Channel selection, Socket.IO subscription join/leave</li>
+<li>ChatComponent: Message input/display, processing and sending, and image preview.</li>
+<li>VideoChatComponent: WebRTC video streaming integration.</li>
+<li>ProfileComponent: Upload and update avatars.</li>
+</ul>
+<h3 id="services">Services</h3>
+<ul>
+<li>AuthService: Login/registration, token storage (localStorage).</li>
+<li>ChatService: Socket.IO events (sendMessage, onMessage), message history loading.</li>
+<li>UploadService: File upload (FHIR POST FormData).</li>
+</ul>
+<h3 id="models">Models</h3>
+<ul>
+<li>src/app/models/user.model.ts: TypeScript interface (as shown in the above data structure).</li>
+</ul>
+<h3 id="routes-approutests">Routes (app.routes.ts)</h3>
+<p>const routes: Routes = [
+{ path: 'login', component: LoginComponent },
+{ path: 'groups', component: GroupListComponent },
+{ path: 'groups/:groupId/channels/:channelId', component: ChatComponent },
+{ path: 'video/:peerId', component: VideoChatComponent }
+];</p>
+<hr>
+<h2 id="client%E2%80%93server-interaction">Client–Server Interaction</h2>
+<h3 id="overview">Overview</h3>
+<p>The communication between the <strong>Angular client</strong> and the <strong>Express/MongoDB server</strong> follows a hybrid architecture combining:</p>
+<ul>
+<li><strong>RESTful APIs</strong> (for CRUD operations &amp; file uploads)</li>
+<li><strong>Socket.IO WebSockets</strong> (for real-time chat and presence updates)</li>
+<li><strong>PeerJS WebRTC signaling</strong> (for video chat connections)</li>
+</ul>
+<p>Both client and server maintain synchronized states via API responses and event broadcasting.</p>
+<hr>
+<h3 id="server-side-file--variable-changes">Server-Side File &amp; Variable Changes</h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Server-Side Process</th>
+<th>Files / Variables Updated</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>User Registration</strong></td>
+<td>A new document is inserted into the <code>users</code> MongoDB collection with default avatar path <code>/uploads/default-avatar.png</code>.</td>
+<td><code>server/controllers/userController.js</code> → <code>users.insertOne()</code></td>
+</tr>
+<tr>
+<td><strong>Login</strong></td>
+<td>Server validates credentials and returns user object as JSON.</td>
+<td><code>server/controllers/userController.js</code></td>
+</tr>
+<tr>
+<td><strong>Avatar Upload</strong></td>
+<td>Image is saved in <code>/uploads/avatars/</code>. The file path is stored in MongoDB (<code>users.avatar</code>).</td>
+<td><code>server/routes/uploadRoutes.js</code> + <code>users.updateOne()</code></td>
+</tr>
+<tr>
+<td><strong>Send Chat Message</strong></td>
+<td>Server receives Socket.IO <code>chatMessage</code> event, stores message object (<code>message</code>, <code>imageUrl</code>, <code>timestamp</code>) in MongoDB <code>messages</code> collection.</td>
+<td><code>server/server.js</code> (Socket.IO section) + <code>db.collection('messages').insertOne()</code></td>
+</tr>
+<tr>
+<td><strong>Send Chat Image</strong></td>
+<td>File is saved in <code>/uploads/chat/</code> directory. File path stored in <code>messages.imageUrl</code>.</td>
+<td><code>server/routes/uploadRoutes.js</code></td>
+</tr>
+<tr>
+<td><strong>Join / Leave Channel</strong></td>
+<td>Socket joins or leaves a room (<code>socket.join(channelId)</code>), updates <code>io.to(channelId)</code> broadcast list.</td>
+<td><code>server/server.js</code> (Socket.IO)</td>
+</tr>
+<tr>
+<td><strong>Video Chat</strong></td>
+<td>PeerJS server manages signaling between connected peers. No DB change.</td>
+<td><code>server/server.js</code> (<code>ExpressPeerServer</code>)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="angular-component-updates">Angular Component Updates</h3>
+<table>
+<thead>
+<tr>
+<th>User Action</th>
+<th>Angular Component</th>
+<th>Server Response</th>
+<th>UI Update</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Login</td>
+<td><code>LoginComponent</code></td>
+<td>JSON user object</td>
+<td>Stores in <code>localStorage</code>, redirects to <code>/groups</code></td>
+</tr>
+<tr>
+<td>View Groups</td>
+<td><code>GroupListComponent</code></td>
+<td>GET <code>/api/groups/user/:id</code></td>
+<td>List of groups rendered dynamically</td>
+</tr>
+<tr>
+<td>Select Channel</td>
+<td><code>ChannelListComponent</code></td>
+<td>Socket emits <code>joinChannel</code></td>
+<td>Loads last 20 messages via <code>chatHistory</code> event</td>
+</tr>
+<tr>
+<td>Send Message</td>
+<td><code>ChatComponent</code></td>
+<td>Emits <code>chatMessage</code> via Socket.IO</td>
+<td>Message appended to chat window instantly</td>
+</tr>
+<tr>
+<td>Upload Image</td>
+<td><code>ChatComponent</code></td>
+<td>POST <code>/api/upload/image</code> → <code>{ path }</code></td>
+<td>Image preview shown in chat bubble</td>
+</tr>
+<tr>
+<td>Update Avatar</td>
+<td><code>ProfileComponent</code></td>
+<td>POST <code>/api/upload/avatar</code> + <code>/api/users/update-avatar</code></td>
+<td>Profile avatar image updates immediately</td>
+</tr>
+<tr>
+<td>Start Video Chat</td>
+<td><code>VideoChatComponent</code></td>
+<td>PeerJS connection established</td>
+<td>Video feed streams into <code>&lt;video&gt;</code> elements</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="example">Example</h3>
+<p><strong>Example — Send Message in chat:</strong></p>
+<ol>
+<li><code>ChatComponent.send()</code> → emits <code>chatMessage</code> with <code>{channelId, userId, username, message}</code></li>
+<li><code>server.js</code> catches event:<pre class="hljs"><code><div>io.on(<span class="hljs-string">'connection'</span>, socket =&gt; {
+  socket.on(<span class="hljs-string">'chatMessage'</span>, <span class="hljs-keyword">async</span> data =&gt; {
+    <span class="hljs-keyword">await</span> db.collection(<span class="hljs-string">'messages'</span>).insertOne(data);
+    io.to(data.channelId).emit(<span class="hljs-string">'chatMessage'</span>, data);
+  });
+});
+</div></code></pre>
+</li>
+<li>Angular <code>ChatService.onMessage()</code> listener receives broadcast.</li>
+</ol>
+
+</body>
+</html>
