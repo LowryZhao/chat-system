@@ -1,68 +1,78 @@
-<h2>Admin Dashboard</h2>
+<div class="admin-page">
+  <h2 class="section-title">Admin Dashboard</h2>
 
-<div *ngIf="authService.hasRole('super_admin')" class="admin-section">
-  <h3>Super Admin — User Management</h3>
+  <div *ngIf="authService.hasRole('super_admin')" class="admin-section">
+    <h3 class="section-subtitle">Super Admin — User Management</h3>
 
-  <div class="card">
-    <h4>Create New User</h4>
-    <input [(ngModel)]="newUserUsername" name="username" placeholder="Username" />
-    <input [(ngModel)]="newUserEmail" name="email" placeholder="Email" />
-    <input [(ngModel)]="newUserPassword" name="password" type="password" placeholder="Password" />
-    <select [(ngModel)]="newUserRole" name="role">
-      <option value="user">User</option>
-      <option value="group_admin">Group Admin</option>
-    </select>
-    <button (click)="createUser()">Create User</button>
+    <div class="card-grid">
+      <div class="card">
+        <h4>Create New User</h4>
+        <input [(ngModel)]="newUserUsername" name="username" placeholder="Username" />
+        <input [(ngModel)]="newUserEmail" name="email" placeholder="Email" />
+        <input [(ngModel)]="newUserPassword" name="password" type="password" placeholder="Password" />
+        <select [(ngModel)]="newUserRole" name="role">
+          <option value="user">User</option>
+          <option value="group_admin">Group Admin</option>
+        </select>
+        <button class="btn create" (click)="createUser()">Create User</button>
+      </div>
+
+      <div class="card">
+        <h4>Remove User</h4>
+        <input [(ngModel)]="removeUserId" name="removeUserId" placeholder="User ID" />
+        <button class="btn remove" (click)="removeUser()">Delete User</button>
+      </div>
+    </div>
   </div>
 
-  <div class="card">
-    <h4>Remove User</h4>
-    <input [(ngModel)]="removeUserId" name="removeUserId" placeholder="User ID" />
-    <button (click)="removeUser()">Delete User</button>
+  <div *ngIf="authService.hasRole('group_admin') || authService.hasRole('super_admin')" class="admin-section">
+    <h3 class="section-subtitle">Group Admin — Group & Channel Management</h3>
+
+    <div class="card-grid">
+      <div class="card">
+        <h4>Create Group</h4>
+        <input [(ngModel)]="groupName" name="groupName" placeholder="Group Name" />
+        <button class="btn create" (click)="createGroup()">Create Group</button>
+      </div>
+
+      <div class="card">
+        <h4>Add / Remove User to Group</h4>
+        <input [(ngModel)]="targetGroupId" name="targetGroupId" placeholder="Group ID" />
+        <input [(ngModel)]="targetUserId" name="targetUserId" placeholder="User ID" />
+        <div class="btn-group">
+          <button class="btn add" (click)="addUserToGroup()">Add</button>
+          <button class="btn remove" (click)="removeUserFromGroup()">Remove</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4>Create Channel</h4>
+        <input [(ngModel)]="channelGroupId" name="channelGroupId" placeholder="Group ID" />
+        <input [(ngModel)]="channelName" name="channelName" placeholder="Channel Name" />
+        <button class="btn create" (click)="createChannel()">Create Channel</button>
+      </div>
+
+      <div class="card">
+        <h4>Add / Remove User to Channel</h4>
+        <input [(ngModel)]="targetChannelId" name="targetChannelId" placeholder="Channel ID" />
+        <input [(ngModel)]="targetUserId" name="targetUserId2" placeholder="User ID" />
+        <div class="btn-group">
+          <button class="btn add" (click)="addUserToChannel()">Add</button>
+          <button class="btn remove" (click)="removeUserFromChannel()">Remove</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4>Delete Group</h4>
+        <input [(ngModel)]="deleteGroupId" name="deleteGroupId" placeholder="Group ID" />
+        <button class="btn remove" (click)="deleteGroup()">Delete Group</button>
+      </div>
+
+      <div class="card">
+        <h4>Delete Channel</h4>
+        <input [(ngModel)]="deleteChannelId" name="deleteChannelId" placeholder="Channel ID" />
+        <button class="btn remove" (click)="deleteChannel()">Delete Channel</button>
+      </div>
+    </div>
   </div>
-</div>
-
-<div *ngIf="authService.hasRole('group_admin') || authService.hasRole('super_admin')" class="admin-section">
-  <h3>Group Admin — Group & Channel Management</h3>
-
-  <div class="card">
-    <h4>Create Group</h4>
-    <input [(ngModel)]="groupName" name="groupName" placeholder="Group Name" />
-    <button (click)="createGroup()">Create Group</button>
-  </div>
-
-  <div class="card">
-    <h4>Add / Remove User to Group</h4>
-    <input [(ngModel)]="targetGroupId" name="targetGroupId" placeholder="Group ID" />
-    <input [(ngModel)]="targetUserId" name="targetUserId" placeholder="User ID" />
-    <button (click)="addUserToGroup()">Add to Group</button>
-    <button (click)="removeUserFromGroup()">Remove from Group</button>
-  </div>
-
-  <div class="card">
-    <h4>Create Channel</h4>
-    <input [(ngModel)]="channelGroupId" name="channelGroupId" placeholder="Group ID" />
-    <input [(ngModel)]="channelName" name="channelName" placeholder="Channel Name" />
-    <button (click)="createChannel()">Create Channel</button>
-  </div>
-
-  <div class="card">
-    <h4>Add / Remove User to Channel</h4>
-    <input [(ngModel)]="targetChannelId" name="targetChannelId" placeholder="Channel ID" />
-    <input [(ngModel)]="targetUserId" name="targetUserId2" placeholder="User ID" />
-    <button (click)="addUserToChannel()">Add to Channel</button>
-    <button (click)="removeUserFromChannel()">Remove from Channel</button>
-  </div>
-
-  <div class="card">
-    <h4>Delete Group</h4>
-    <input [(ngModel)]="deleteGroupId" name="deleteGroupId" placeholder="Group ID" />
-    <button (click)="deleteGroup()">Delete Group</button>
-  </div>
-
-<div class="card">
-  <h4>Delete Channel</h4>
-  <input [(ngModel)]="deleteChannelId" name="deleteChannelId" placeholder="Channel ID" />
-  <button (click)="deleteChannel()">Delete Channel</button>
-</div>
 </div>

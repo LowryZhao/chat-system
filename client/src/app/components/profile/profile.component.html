@@ -1,12 +1,16 @@
-<h2>My Profile</h2>
+<div class="profile-page">
+  <h2 class="section-title">My Profile</h2>
 
-<div class="profile-card">
-  <img [src]="avatarUrl" alt="avatar" class="avatar" />
-  <h4>{{ user?.username }}</h4>
-  <p>{{ user?.email }}</p>
+  <div class="profile-card">
+    <img [src]="avatarUrl" alt="avatar" class="avatar" />
+    <h4 class="username">{{ user?.username }}</h4>
+    <p class="email">{{ user?.email }}</p>
 
-  <input type="file" (change)="pick($event)" />
-  <button (click)="upload()" [disabled]="uploading">
-    {{ uploading ? 'Uploading...' : 'Update Avatar' }}
-  </button>
+    <div class="upload-section">
+      <input type="file" id="avatarUpload" (change)="pick($event)" />
+      <button class="btn upload" (click)="upload()" [disabled]="uploading">
+        {{ uploading ? 'Uploading...' : 'Update Avatar' }}
+      </button>
+    </div>
+  </div>
 </div>

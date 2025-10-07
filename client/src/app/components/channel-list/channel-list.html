@@ -1,32 +1,40 @@
-<h2>Channels</h2>
+<div class="channels-page">
+  <h2 class="section-title">Channels</h2>
 
-<label>
-  Group:
-  <select [(ngModel)]="selectedGroupId" (change)="onGroupChange()">
-    <option [value]="">-- Select Group --</option>
-    <option *ngFor="let g of myGroups" [value]="g.id">{{ g.name }}</option>
-  </select>
-</label>
+  <div class="group-selector">
+    <label for="groupSelect">Group:</label>
+    <select id="groupSelect" [(ngModel)]="selectedGroupId" (change)="onGroupChange()">
+      <option [value]="">-- Select Group --</option>
+      <option *ngFor="let g of myGroups" [value]="g.id">{{ g.name }}</option>
+    </select>
+  </div>
 
-<ul *ngIf="channels.length > 0; else noChannels">
-  <li *ngFor="let c of channels">
-    {{ c.name }}
-    <button (click)="leaveChannel(c.id)" *ngIf="authService.isAuthenticated()">Leave</button>
-    <button (click)="openChat(c.id)" *ngIf="authService.isAuthenticated()">Open Chat</button>
-  </li>
-</ul>
+  <ul *ngIf="channels.length > 0; else noChannels" class="channel-list">
+    <li *ngFor="let c of channels" class="channel-card">
+      <div class="channel-info">
+        <strong>{{ c.name }}</strong>
+      </div>
 
-<ng-template #noChannels>
-  <p>No channels in this group yet.</p>
-</ng-template>
+      <div class="btn-group">
+        <button class="btn leave" (click)="leaveChannel(c.id)" *ngIf="authService.isAuthenticated()">Leave</button>
+        <button class="btn open" (click)="openChat(c.id)" *ngIf="authService.isAuthenticated()">Open Chat</button>
+      </div>
+    </li>
+  </ul>
 
-<div *ngIf="authService.hasRole('group_admin')" class="create-section">
-  <h4>Create New Channel</h4>
-  <input [(ngModel)]="newChannelName" placeholder="Enter channel name" />
-  <button (click)="createChannel()">Create</button>
+  <ng-template #noChannels>
+    <p class="no-data">No channels in this group yet.</p>
+  </ng-template>
+
+  <hr class="divider" />
+
+  <div *ngIf="authService.hasRole('group_admin')" class="create-section">
+    <h4 class="section-subtitle">Create New Channel</h4>
+    <div class="create-form">
+      <input [(ngModel)]="newChannelName" placeholder="Enter channel name" />
+      <button class="btn create" (click)="createChannel()">Create</button>
+    </div>
+  </div>
+
+  <app-chat *ngIf="selectedChannelId" [channelId]="selectedChannelId"></app-chat>
 </div>
-
-<app-chat
-  *ngIf="selectedChannelId"
-  [channelId]="selectedChannelId">
-</app-chat>

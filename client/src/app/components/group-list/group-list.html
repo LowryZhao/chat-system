@@ -1,33 +1,45 @@
-<h2>My Groups</h2>
+<div class="groups-page">
+  <h2 class="section-title">My Groups</h2>
 
-<ul *ngIf="myGroups.length > 0; else noGroups">
-  <li *ngFor="let g of myGroups">
-    {{ g.name }} ({{ g.members.length || 0 }} members)
-  </li>
-</ul>
-
-<ng-template #noGroups>
-  <p>You are not in any groups yet.</p>
-</ng-template>
-
-<hr />
-
-<div *ngIf="authService.hasRole('group_admin') || authService.hasRole('super_admin')">
-  <h3>All Groups (Admin View)</h3>
-
-  <label>User ID to manage:</label>
-  <input [(ngModel)]="targetUserId" placeholder="Enter user ID" />
-
-  <ul *ngIf="allGroups.length > 0; else noAllGroups">
-    <li *ngFor="let g of allGroups">
-      <strong>{{ g.name }}</strong>
-      <span>({{ g.members.length || 0 }} members)</span>
-      <button (click)="addUserToGroup(g.id, targetUserId)">Add User</button>
-      <button (click)="removeUserFromGroup(g.id, targetUserId)">Remove User</button>
+  <ul *ngIf="myGroups.length > 0; else noGroups" class="group-list">
+    <li *ngFor="let g of myGroups" class="group-card">
+      <div class="group-info">
+        <span class="group-name">{{ g.name }}</span>
+        <span class="group-members"> {{ g.members.length || 0 }} members</span>
+      </div>
     </li>
   </ul>
 
-  <ng-template #noAllGroups>
-    <p>No groups found.</p>
+  <ng-template #noGroups>
+    <p class="no-data">You are not in any groups yet.</p>
   </ng-template>
+
+  <hr class="divider" />
+
+  <div *ngIf="authService.hasRole('group_admin') || authService.hasRole('super_admin')" class="admin-section">
+    <h3 class="section-subtitle">All Groups (Admin View)</h3>
+
+    <div class="input-row">
+      <label for="userId">User ID to manage:</label>
+      <input id="userId" [(ngModel)]="targetUserId" placeholder="Enter user ID" />
+    </div>
+
+    <ul *ngIf="allGroups.length > 0; else noAllGroups" class="group-list">
+      <li *ngFor="let g of allGroups" class="group-card admin-card">
+        <div class="group-info">
+          <strong class="group-name">{{ g.name }}</strong>
+          <span class="group-members"> {{ g.members.length || 0 }} members</span>
+        </div>
+
+        <div class="btn-group">
+          <button class="btn add" (click)="addUserToGroup(g.id, targetUserId)">Add User</button>
+          <button class="btn remove" (click)="removeUserFromGroup(g.id, targetUserId)">Remove User</button>
+        </div>
+      </li>
+    </ul>
+
+    <ng-template #noAllGroups>
+      <p class="no-data">No groups found.</p>
+    </ng-template>
+  </div>
 </div>

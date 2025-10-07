@@ -1,0 +1,114 @@
+.video-page {
+  background-color: #f3f9f4;
+  min-height: 100vh;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+}
+
+.video-header {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.video-header h2 {
+  color: #1b4332;
+  font-size: 26px;
+  margin: 0;
+}
+
+.subtitle {
+  color: #388e3c;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.video-container {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  width: 90%;
+  max-width: 800px;
+}
+
+.video-frame {
+  width: 45%;
+  background: #000;
+  border-radius: 10px;
+  border: 3px solid #a5d6a7;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.video-frame.self {
+  border-color: #81c784;
+}
+
+.video-frame.remote {
+  border-color: #388e3c;
+}
+
+.status-area {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.status-area p {
+  margin: 4px 0;
+  font-weight: 500;
+}
+
+.ok {
+  color: #2e7d32;
+}
+
+.error {
+  color: #c62828;
+}
+
+.peer-id span {
+  background-color: #d4edda;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-family: monospace;
+}
+
+.control-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 15px;
+  gap: 10px;
+}
+
+input {
+  padding: 8px 12px;
+  border: 1px solid #c3e6cb;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 260px;
+  background-color: white;
+  transition: border-color 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: #28a745;
+}
+
+.btn.call {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.btn.call:hover {
+  background-color: #1e7e34;
+}

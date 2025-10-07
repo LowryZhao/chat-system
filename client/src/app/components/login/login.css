@@ -1,0 +1,95 @@
+.login-page {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #e6f4ea; 
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+}
+
+.login-box {
+  background: #ffffff;
+  padding: 40px 36px;
+  border-radius: 14px;
+  width: 340px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.login-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #2f4f4f;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #155724;
+  margin-bottom: 4px;
+  display: block;
+}
+
+input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #c3e6cb;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+input:focus {
+  border-color: #28a745;
+}
+
+.btn-primary {
+  width: 100%;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #218838;
+}
+
+.btn-toggle {
+  background: none;
+  border: none;
+  color: #1b5e20;
+  font-size: 13px;
+  margin-top: 15px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.btn-toggle:hover {
+  color: #155724;
+}
+
+.error-msg {
+  color: #e63946;
+  font-size: 13px;
+  margin-top: 10px;
+}

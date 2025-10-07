@@ -1,1 +1,27 @@
-<p>video-chat works!</p>
+<div class="video-page">
+  <div class="video-header">
+    <h2> Video Chat </h2>
+    <p class="subtitle">Peer-to-Peer Live Connection</p>
+  </div>
+
+  <div class="video-container">
+    <video #myVideo autoplay muted playsinline class="video-frame self"></video>
+    <video #remoteVideo autoplay playsinline class="video-frame remote"></video>
+  </div>
+
+  <div class="status-area">
+    <p [ngClass]="statusClass">{{ statusMessage }}</p>
+    <p *ngIf="myPeerId" class="peer-id">
+      <strong>Your Peer ID:</strong> <span>{{ myPeerId }}</span>
+    </p>
+  </div>
+
+  <div class="control-panel">
+    <input
+      [(ngModel)]="remotePeerId"
+      placeholder="Enter Remote Peer ID"
+      [ngModelOptions]="{ standalone: true }"
+    />
+    <button (click)="call()" class="btn call">Call</button>
+  </div>
+</div>

@@ -1,10 +1,26 @@
-<h1>Chat System</h1>
-<nav>
-  <a routerLink="/groups">Groups</a>
-  <a routerLink="/channels">Channels</a>
-  <a routerLink="/profile">Profile</a>
-  <a *ngIf="auth.hasRole('super_admin') || auth.hasRole('group_admin')" routerLink="/admin">Admin</a>
-  <button (click)="logout()">Logout</button>
-</nav>
+<div *ngIf="auth.isAuthenticated(); else loginPage">
+  <header class="header">
+    <h1>Chat System</h1>
 
-<router-outlet></router-outlet>
+    <nav class="navbar">
+      <a routerLink="/groups" routerLinkActive="active">Groups</a>
+      <a routerLink="/channels" routerLinkActive="active">Channels</a>
+      <a routerLink="/profile" routerLinkActive="active">Profile</a>
+      <a
+        *ngIf="auth.hasRole('super_admin') || auth.hasRole('group_admin')"
+        routerLink="/admin"
+        routerLinkActive="active"
+      >
+        Admin
+      </a>
+
+      <button class="btn-logout" (click)="logout()">Logout</button>
+    </nav>
+  </header>
+
+  <router-outlet></router-outlet>
+</div>
+
+<ng-template #loginPage>
+  <router-outlet></router-outlet>
+</ng-template>

@@ -1,19 +1,51 @@
-<div class="login-container">
-  <h2>{{ isRegister ? 'Register' : 'Login' }}</h2>
+<div class="login-page">
+  <div class="login-box">
+    <h2 class="title">{{ isRegister ? 'Create Account' : 'Welcome Back' }}</h2>
 
-  <form (ngSubmit)="onSubmit()">
-    <input [(ngModel)]="username" name="username" placeholder="Username" required />
-    <input *ngIf="isRegister" [(ngModel)]="email" name="email" placeholder="Email" required />
-    <input [(ngModel)]="password" name="password" placeholder="Password" type="password" required />
+    <form (ngSubmit)="onSubmit()" novalidate>
+      <div class="input-group">
+        <label for="username">Username</label>
+        <input
+          id="username"
+          [(ngModel)]="username"
+          name="username"
+          placeholder="Enter your username"
+          required
+        />
+      </div>
 
-    <button type="submit" [disabled]="loading">
-      {{ isRegister ? 'Register' : 'Login' }}
-    </button>
+      <div class="input-group" *ngIf="isRegister">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="Enter your email"
+          required
+        />
+      </div>
 
-    <button type="button" (click)="toggleMode()" class="toggle-btn">
-      {{ isRegister ? 'Already have an account? Login' : 'New user? Register' }}
-    </button>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          [(ngModel)]="password"
+          name="password"
+          type="password"
+          placeholder="Enter your password"
+          required
+        />
+      </div>
 
-    <p *ngIf="error" class="error">{{ error }}</p>
-  </form>
+      <button type="submit" [disabled]="loading" class="btn-primary">
+        {{ isRegister ? 'Register' : 'Login' }}
+      </button>
+
+      <button type="button" (click)="toggleMode()" class="btn-toggle">
+        {{ isRegister ? 'Already have an account? Login' : 'New user? Register' }}
+      </button>
+
+      <p *ngIf="error" class="error-msg">{{ error }}</p>
+    </form>
+  </div>
 </div>

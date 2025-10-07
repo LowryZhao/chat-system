@@ -1,50 +1,56 @@
-<h3>Channel: {{ channelId }}</h3>
+<div class="chat-container">
+  <div class="chat-header">
+    <h3>Channel: {{ channelId }}</h3>
+    <button (click)="goToVideoChat()" class="video-btn">
+        Video Chat
+    </button>
+  </div>
 
-<div class="chat-actions">
-  <button (click)="goToVideoChat()" class="video-btn">Video Chat</button>
-</div>
+  <div #scrollContainer class="chat-box">
+    <div *ngFor="let msg of messages" class="message-item">
 
-<div #scrollContainer class="chat-box">
-  <div *ngFor="let msg of messages">
+      <div *ngIf="msg.system" class="system-msg">
+        <em>{{ msg.message }}</em>
+      </div>
 
-    <div *ngIf="msg.system" class="system-msg">
-      <em>{{ msg.message }}</em>
-    </div>
-
-    <div *ngIf="!msg.system" class="user-msg">
-      <img
-        *ngIf="msg.avatar"
-        [src]="'http://localhost:3000' + msg.avatar"
-        alt="avatar"
-        class="avatar"
-      />
-
-      <div class="message-content">
-        <strong class="username">{{ msg.username }}</strong>
-        <span *ngIf="msg.message" class="text">{{ msg.message }}</span>
-
+      <div *ngIf="!msg.system" class="user-msg">
         <img
-          *ngIf="msg.imageUrl"
-          [src]="'http://localhost:3000' + msg.imageUrl"
-          alt="image message"
-          class="chat-img"
+          *ngIf="msg.avatar"
+          [src]="'http://localhost:3000' + msg.avatar"
+          alt="avatar"
+          class="avatar"
         />
 
-        <small *ngIf="msg.timestamp" class="timestamp">
-          {{ msg.timestamp | date: 'shortTime' }}
-        </small>
+        <div class="message-bubble">
+          <div class="message-header">
+            <strong class="username">{{ msg.username }}</strong>
+            <small *ngIf="msg.timestamp" class="timestamp">
+              {{ msg.timestamp | date: 'shortTime' }}
+            </small>
+          </div>
+
+          <div class="message-body">
+            <span *ngIf="msg.message" class="text">{{ msg.message }}</span>
+            <img
+              *ngIf="msg.imageUrl"
+              [src]="'http://localhost:3000' + msg.imageUrl"
+              alt="chat image"
+              class="chat-img"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<div class="chat-input">
-  <input
-    [(ngModel)]="text"
-    placeholder="Type your message..."
-    (keydown.enter)="send()"
-    class="message-input"
-  />
-  <input type="file" (change)="pickImage($event)" class="file-input" />
-  <button (click)="send()" class="send-btn">Send</button>
+  <div class="chat-input">
+    <input
+      [(ngModel)]="text"
+      placeholder="Type your message..."
+      (keydown.enter)="send()"
+      class="message-input"
+    />
+    <input type="file" (change)="pickImage($event)" class="file-input" />
+    <button (click)="send()" class="send-btn">Send</button>
+  </div>
 </div>

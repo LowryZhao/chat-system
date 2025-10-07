@@ -1,0 +1,153 @@
+.channels-page {
+  background-color: #f3f9f4;
+  min-height: 100vh;
+  padding: 30px 50px;
+  font-family: 'Poppins', 'Segoe UI', sans-serif;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2f4f4f;
+  margin-bottom: 20px;
+}
+
+.group-selector {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.group-selector label {
+  font-size: 15px;
+  font-weight: 500;
+  color: #155724;
+}
+
+.group-selector select {
+  padding: 8px 12px;
+  border: 1px solid #c3e6cb;
+  border-radius: 6px;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.group-selector select:focus {
+  border-color: #28a745;
+}
+
+.channel-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.channel-card {
+  background: white;
+  border-radius: 10px;
+  padding: 15px 18px;
+  margin-bottom: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.channel-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+}
+
+.channel-info strong {
+  font-weight: 600;
+  color: #1b4332;
+}
+
+.btn-group {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.btn.leave {
+  background-color: #e63946;
+}
+
+.btn.leave:hover {
+  background-color: #b71c1c;
+}
+
+.btn.open {
+  background-color: #28a745;
+}
+
+.btn.open:hover {
+  background-color: #218838;
+}
+
+.create-section {
+  margin-top: 30px;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.section-subtitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2f4f4f;
+  margin-bottom: 10px;
+}
+
+.create-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.create-form input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #c3e6cb;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.create-form input:focus {
+  border-color: #28a745;
+}
+
+.btn.create {
+  background-color: #007bff;
+}
+
+.btn.create:hover {
+  background-color: #0056b3;
+}
+
+.divider {
+  border: none;
+  border-top: 2px solid #d4edda;
+  margin: 25px 0;
+}
+
+.no-data {
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  margin-top: 10px;
+}
