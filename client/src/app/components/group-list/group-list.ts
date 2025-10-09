@@ -24,27 +24,37 @@ export class GroupListComponent implements OnInit {
   ngOnInit() {
     this.loadData();
   }
-
+  
   private loadData() {
-    const userId = this.authService.getUser()?.id;
-    if (!userId) return;
+    const user = this.authService.getUser?.();
+    const userId = user?.id;
+
+    if (!userId) {
+      console.warn('No user ID found in authService');
+      this.myGroups = [];
+      this.allGroups = [];
+      return;
+    }
 
     this.groupService.getUserGroups(userId).subscribe({
-      next: (gs) => (this.myGroups = gs || []),
+      next: (gs) => (this.myGroups = gs ?? []),
       error: () => (this.myGroups = [])
     });
 
-    if (this.authService.hasRole('group_admin') || this.authService.hasRole('super_admin')) {
+    if (this.authService.hasRole?.('group_admin') || this.authService.hasRole?.('super_admin')) {
       this.groupService.getAllGroups().subscribe({
-        next: (gs) => (this.allGroups = gs || []),
+        next: (gs) => (this.allGroups = gs ?? []),
         error: () => (this.allGroups = [])
       });
+    } else {
+      this.allGroups = [];
     }
   }
 
   addUserToGroup(groupId: string, userId: string) {
-    const adminId = this.authService.getUser().id;
-    if (!this.authService.hasRole('group_admin') && !this.authService.hasRole('super_admin')) return;
+    const adminId = this.authService.getUser?.()?.id;
+    if (!adminId) return;
+    if (!this.authService.hasRole?.('group_admin') && !this.authService.hasRole?.('super_admin')) return;
 
     this.groupService.addUserToGroup(groupId, adminId, userId).subscribe({
       next: () => {
@@ -56,8 +66,9 @@ export class GroupListComponent implements OnInit {
   }
 
   removeUserFromGroup(groupId: string, userId: string) {
-    const adminId = this.authService.getUser().id;
-    if (!this.authService.hasRole('group_admin') && !this.authService.hasRole('super_admin')) return;
+    const adminId = this.authService.getUser?.()?.id;
+    if (!adminId) return;
+    if (!this.authService.hasRole?.('group_admin') && !this.authService.hasRole?.('super_admin')) return;
 
     this.groupService.removeUserFromGroup(groupId, adminId, userId).subscribe({
       next: () => {
@@ -69,7 +80,8 @@ export class GroupListComponent implements OnInit {
   }
 
   isMember(group: Group): boolean {
-    const uid = this.authService.getUser().id;
-    return group.members?.includes(uid);
+    if (!group || !group.members) return false;
+    const uid = this.authService.getUser?.()?.id;
+    return group.members.includes(uid);
   }
 }

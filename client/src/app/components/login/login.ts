@@ -29,26 +29,17 @@ export class LoginComponent {
     this.error = null;
     this.loading = true;
 
-    console.log(`Attempting login: ${this.username}`);
-
     this.authService.login(this.username, this.password).subscribe({
       next: (user) => {
-        console.log('Login successful:', user);
-
         if (user) {
           this.authService.saveUser(user);
-
-          setTimeout(() => {
-            this.router.navigate(['/groups']);
-          }, 300);
+          setTimeout(() => this.router.navigate(['/groups']), 300);
         } else {
           this.error = 'Invalid credentials, please try again.';
         }
-
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Login failed:', err);
+      error: () => {
         this.error = 'Login failed. Please try again.';
         this.loading = false;
       }
@@ -60,10 +51,14 @@ export class LoginComponent {
     this.loading = true;
 
     this.authService.register(this.username, this.email, this.password).subscribe({
-      next: () => {
-        this.isRegister = false;
-        this.password = '';
-        this.error = 'Registration successful. Please login.';
+      next: (res) => {
+        if (res) {
+          this.isRegister = false;
+          this.password = '';
+          this.error = 'Registration successful. Please login.';
+        } else {
+          this.error = 'Registration failed. Please try again.';
+        }
         this.loading = false;
       },
       error: () => {

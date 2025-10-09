@@ -1,11 +1,11 @@
 <div class="groups-page">
   <h2 class="section-title">My Groups</h2>
 
-  <ul *ngIf="myGroups.length > 0; else noGroups" class="group-list">
-    <li *ngFor="let g of myGroups" class="group-card">
+  <ul *ngIf="(myGroups?.length ?? 0) > 0; else noGroups" class="group-list">
+    <li *ngFor="let g of myGroups ?? []" class="group-card">
       <div class="group-info">
         <span class="group-name">{{ g.name }}</span>
-        <span class="group-members"> {{ g.members.length || 0 }} members</span>
+        <span class="group-members">{{ g.members?.length ?? 0 }} members</span>
       </div>
     </li>
   </ul>
@@ -16,7 +16,7 @@
 
   <hr class="divider" />
 
-  <div *ngIf="authService.hasRole('group_admin') || authService.hasRole('super_admin')" class="admin-section">
+  <div *ngIf="authService.hasRole?.('group_admin') || authService.hasRole?.('super_admin')" class="admin-section">
     <h3 class="section-subtitle">All Groups (Admin View)</h3>
 
     <div class="input-row">
@@ -24,11 +24,11 @@
       <input id="userId" [(ngModel)]="targetUserId" placeholder="Enter user ID" />
     </div>
 
-    <ul *ngIf="allGroups.length > 0; else noAllGroups" class="group-list">
-      <li *ngFor="let g of allGroups" class="group-card admin-card">
+    <ul *ngIf="(allGroups?.length ?? 0) > 0; else noAllGroups" class="group-list">
+      <li *ngFor="let g of allGroups ?? []" class="group-card admin-card">
         <div class="group-info">
           <strong class="group-name">{{ g.name }}</strong>
-          <span class="group-members"> {{ g.members.length || 0 }} members</span>
+          <span class="group-members">{{ g.members?.length ?? 0 }} members</span>
         </div>
 
         <div class="btn-group">

@@ -2,15 +2,31 @@
   <h2 class="section-title">My Profile</h2>
 
   <div class="profile-card">
-    <img [src]="avatarUrl" alt="avatar" class="avatar" />
-    <h4 class="username">{{ user?.username }}</h4>
-    <p class="email">{{ user?.email }}</p>
+    <img
+      [src]="avatarUrl || 'http://localhost:3000/uploads/default-avatar.png'"
+      alt="avatar"
+      class="avatar"
+    />
+
+    <h4 class="username">{{ user?.username ?? 'Anonymous User' }}</h4>
+    <p class="email">{{ user?.email ?? 'no-email@example.com' }}</p>
 
     <div class="upload-section">
-      <input type="file" id="avatarUpload" (change)="pick($event)" />
-      <button class="btn upload" (click)="upload()" [disabled]="uploading">
+      <input
+        type="file"
+        id="avatarUpload"
+        (change)="pick($event)"
+        accept="image/*"
+      />
+      <button
+        class="btn upload"
+        (click)="upload()"
+        [disabled]="uploading"
+      >
         {{ uploading ? 'Uploading...' : 'Update Avatar' }}
       </button>
     </div>
+
+    <div *ngIf="uploading" class="loading-msg">Uploading your avatar, please wait...</div>
   </div>
 </div>

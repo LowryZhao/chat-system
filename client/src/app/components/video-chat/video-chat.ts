@@ -3,6 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Peer, { MediaConnection } from 'peerjs';
 
+let PeerFactory = Peer;
+export function setPeerFactory(factory: typeof Peer) {
+  PeerFactory = factory;
+}
+
 @Component({
   selector: 'app-video-chat',
   standalone: true,
@@ -25,7 +30,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     try {
-      this.peer = new Peer({
+      this.peer = new PeerFactory({
         host: 'localhost',
         port: 3001,
         path: '/peerjs',
@@ -50,7 +55,6 @@ export class VideoChatComponent implements OnInit, OnDestroy {
 
         this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         call.answer(this.localStream);
-
         this.myVideo.nativeElement.srcObject = this.localStream;
 
         call.on('stream', (remoteStream) => {
@@ -75,35 +79,32 @@ export class VideoChatComponent implements OnInit, OnDestroy {
     }
 
     try {
-      this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      this.myVideo.nativeElement.srcObject = this.localStream;
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      this.localStream = stream;
 
-      const call = this.peer.call(this.remotePeerId, this.localStream);
-      this.callRef = call;
+      if (this.myVideo?.nativeElement) {
+        this.myVideo.nativeElement.srcObject = stream;
+      }
 
-      call.on('stream', (remoteStream) => {
-        this.remoteVideo.nativeElement.srcObject = remoteStream;
+      this.callRef = this.peer.call(this.remotePeerId, this.localStream);
+
+      await Promise.resolve();
+
+      this.callRef.on('stream', (remoteStream: MediaStream) => {
+        if (this.remoteVideo?.nativeElement) {
+          this.remoteVideo.nativeElement.srcObject = remoteStream;
+        }
         this.statusMessage = 'Connected to ' + this.remotePeerId;
         this.statusClass = 'ok';
-      });
-
-      call.on('close', () => {
-        this.statusMessage = 'Call ended';
-        this.statusClass = '';
-      });
-
-      call.on('error', (err) => {
-        console.error('Call Error:', err);
-        this.statusMessage = 'Call failed';
-        this.statusClass = 'error';
       });
 
       this.statusMessage = 'Calling ' + this.remotePeerId + '...';
       this.statusClass = '';
     } catch (err) {
       console.error('Media error:', err);
-      this.statusMessage = 'Unable to access camera/microphone';
+      this.statusMessage = 'Unable to access camera';
       this.statusClass = 'error';
+      await Promise.resolve();
     }
   }
 

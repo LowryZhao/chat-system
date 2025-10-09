@@ -38,7 +38,7 @@
       <div class="card">
         <h4>Add / Remove User to Group</h4>
         <input [(ngModel)]="targetGroupId" name="targetGroupId" placeholder="Group ID" />
-        <input [(ngModel)]="targetUserId" name="targetUserId" placeholder="User ID" />
+        <input [(ngModel)]="targetGroupUserId" name="targetGroupUserId" placeholder="User ID" />
         <div class="btn-group">
           <button class="btn add" (click)="addUserToGroup()">Add</button>
           <button class="btn remove" (click)="removeUserFromGroup()">Remove</button>
@@ -55,7 +55,7 @@
       <div class="card">
         <h4>Add / Remove User to Channel</h4>
         <input [(ngModel)]="targetChannelId" name="targetChannelId" placeholder="Channel ID" />
-        <input [(ngModel)]="targetUserId" name="targetUserId2" placeholder="User ID" />
+        <input [(ngModel)]="targetChannelUserId" name="targetChannelUserId" placeholder="User ID" />
         <div class="btn-group">
           <button class="btn add" (click)="addUserToChannel()">Add</button>
           <button class="btn remove" (click)="removeUserFromChannel()">Remove</button>

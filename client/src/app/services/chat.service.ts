@@ -1,6 +1,12 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { io, Socket } from 'socket.io-client';
+import { io as socketIo, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
+
+// 允许测试时注入自定义 io 工厂 
+let ioFactory = socketIo;
+export function setIoFactory(factory: typeof socketIo) {
+  ioFactory = factory;
+}
 
 @Injectable({ providedIn: 'root' })
 export class ChatService implements OnDestroy {
@@ -14,7 +20,7 @@ export class ChatService implements OnDestroy {
 
   private connect() {
     if (!this.connected) {
-      this.socket = io(this.SERVER_URL, {
+      this.socket = ioFactory(this.SERVER_URL, {
         transports: ['websocket'],
         reconnection: true,
         reconnectionAttempts: 5,
@@ -35,20 +41,20 @@ export class ChatService implements OnDestroy {
   }
 
   sendMessage(
-  channelId: string,
-  userId: string,
-  username: string,
-  message?: string | null,
-  imageUrl?: string | null
-) {
-  this.socket.emit('chatMessage', {
-    channelId,
-    userId,
-    username,
-    message: message || null,
-    imageUrl: imageUrl || null
-  });
-}
+    channelId: string,
+    userId: string,
+    username: string,
+    message?: string | null,
+    imageUrl?: string | null
+  ) {
+    this.socket.emit('chatMessage', {
+      channelId,
+      userId,
+      username,
+      message: message || null,
+      imageUrl: imageUrl || null
+    });
+  }
 
   onHistory(): Observable<any[]> {
     return new Observable(observer => {
