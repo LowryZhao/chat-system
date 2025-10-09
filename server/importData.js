@@ -12,6 +12,8 @@ const filePath = './models/data.json';
     console.log('Connected to MongoDB');
 
     const db = client.db(dbName);
+    
+    //解析JSON文件
     const rawData = fs.readFileSync(filePath, 'utf-8');
     const jsonData = JSON.parse(rawData);
 

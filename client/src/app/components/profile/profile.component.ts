@@ -27,16 +27,19 @@ export class ProfileComponent implements OnInit {
     }
   }
 
+//文件选择  
   pick(event: any) {
     this.file = event.target?.files?.[0] ?? null;
   }
 
+//头像上传功能  
   upload() {
     if (!this.file) {
       alert('Please select a file first.');
       return;
     }
 
+    //防止重复点击
     this.uploading = true;
 
     const fd = new FormData();
@@ -65,6 +68,7 @@ export class ProfileComponent implements OnInit {
       });
   }
 
+//头像的路径
   get avatarUrl(): string {
     const avatarPath = this.user?.avatar ?? '';
     if (avatarPath && avatarPath.includes('/uploads/')) {

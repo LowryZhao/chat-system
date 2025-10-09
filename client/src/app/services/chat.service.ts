@@ -32,14 +32,17 @@ export class ChatService implements OnDestroy {
     }
   }
 
+  //加入
   joinChannel(channelId: string, userId: string, username: string) {
     this.socket.emit('joinChannel', { channelId, userId, username });
   }
 
+  //离开
   leaveChannel(channelId: string, username: string) {
     this.socket.emit('leaveChannel', { channelId, username });
   }
 
+  //发送信息功能
   sendMessage(
     channelId: string,
     userId: string,
@@ -56,6 +59,7 @@ export class ChatService implements OnDestroy {
     });
   }
 
+  //获取历史聊天记录
   onHistory(): Observable<any[]> {
     return new Observable(observer => {
       this.socket.off('chatHistory');
@@ -63,6 +67,7 @@ export class ChatService implements OnDestroy {
     });
   }
 
+  //监听新消息
   onMessage(): Observable<any> {
     return new Observable(observer => {
       this.socket.off('chatMessage');
@@ -70,6 +75,7 @@ export class ChatService implements OnDestroy {
     });
   }
 
+  //用户加入提醒
   onUserJoined(): Observable<any> {
     return new Observable(observer => {
       this.socket.off('userJoined');
@@ -77,6 +83,7 @@ export class ChatService implements OnDestroy {
     });
   }
 
+  //用户离开提醒
   onUserLeft(): Observable<any> {
     return new Observable(observer => {
       this.socket.off('userLeft');
@@ -84,6 +91,7 @@ export class ChatService implements OnDestroy {
     });
   }
 
+  //系统通知
   onSystem(): Observable<any> {
     return new Observable(observer => {
       this.socket.off('system');
@@ -91,11 +99,12 @@ export class ChatService implements OnDestroy {
     });
   }
 
+  //断开连接
   ngOnDestroy(): void {
     if (this.socket && this.connected) {
       this.socket.disconnect();
       this.connected = false;
-      console.log('🔌 Socket disconnected');
+      console.log('Socket disconnected');
     }
   }
 }

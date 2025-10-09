@@ -1,14 +1,17 @@
 const { connectDB } = require('../db');
 
+//是否是superadmin
 async function isSuperAdmin(db, userId) {
   const user = await db.collection('users').findOne({ id: userId });
   return user?.roles?.includes('super_admin');
 }
 
+//是否是groupadmmin
 async function isGroupAdmin(db, userId, group) {
   return group.admins.includes(userId) || await isSuperAdmin(db, userId);
 }
 
+//创建
 exports.createGroup = async (req, res) => {
   try {
     const { name, adminId } = req.body;
@@ -38,6 +41,7 @@ exports.createGroup = async (req, res) => {
   }
 };
 
+//获取群组列表
 exports.getAllGroups = async (req, res) => {
   try {
     const db = await connectDB();
@@ -48,6 +52,7 @@ exports.getAllGroups = async (req, res) => {
   }
 };
 
+//添加用户到群组
 exports.addUserToGroup = async (req, res) => {
   try {
     const { groupId } = req.params;
@@ -72,6 +77,7 @@ exports.addUserToGroup = async (req, res) => {
   }
 };
 
+//从群组中移除用户
 exports.removeUserFromGroup = async (req, res) => {
   try {
     const { groupId } = req.params;
@@ -96,6 +102,7 @@ exports.removeUserFromGroup = async (req, res) => {
   }
 };
 
+//删除群组
 exports.deleteGroup = async (req, res) => {
   try {
     const { groupId } = req.params;
@@ -122,6 +129,7 @@ exports.deleteGroup = async (req, res) => {
   }
 };
 
+//获取用户的群组
 exports.getUserGroups = async (req, res) => {
   try {
     const { userId } = req.params;

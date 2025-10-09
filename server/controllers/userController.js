@@ -1,5 +1,6 @@
 const { connectDB } = require('../db');
 
+//登录接口
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -16,6 +17,7 @@ exports.login = async (req, res) => {
   }
 };
 
+//注册
 exports.register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -44,6 +46,7 @@ exports.register = async (req, res) => {
   }
 };
 
+//admin创建用户
 exports.createUserByAdmin = async (req, res) => {
   try {
     const { adminId, username, email, password, role } = req.body;
@@ -75,6 +78,7 @@ exports.createUserByAdmin = async (req, res) => {
   }
 };
 
+//admin移除用户
 exports.removeUser = async (req, res) => {
   try {
     const { adminId, userId } = req.body;
@@ -95,6 +99,7 @@ exports.removeUser = async (req, res) => {
   }
 };
 
+//更新头像
 exports.updateAvatar = async (req, res) => {
   try {
     const { userId, avatarPath } = req.body;

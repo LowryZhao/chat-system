@@ -14,7 +14,6 @@ export const routes: Routes = [
   { path: 'channels', component: ChannelListComponent, canActivate: [AuthGuard] },
   { path: 'admin', component: AdminDashboardComponent, canActivate: [AuthGuard] },
   { path: 'video', loadComponent: () => import('./components/video-chat/video-chat').then(m => m.VideoChatComponent) },
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'profile', component: ProfileComponent },
   { path: 'video', component: VideoChatComponent },
 ];

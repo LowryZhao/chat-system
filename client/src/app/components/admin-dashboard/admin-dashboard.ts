@@ -41,6 +41,7 @@ export class AdminDashboardComponent implements OnInit {
 
   ngOnInit() {}
 
+  //用户管理
   createUser() {
     const adminId = this.authService.getUser()?.id;
     if (!this.newUserUsername || !this.newUserEmail || !this.newUserPassword) {
@@ -64,6 +65,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
+  //群组管理
   createGroup() {
     const adminId = this.authService.getUser()?.id;
     this.groupService.createGroup(this.groupName, adminId).subscribe({
@@ -96,6 +98,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
+  //频道管理
   createChannel() {
     const adminId = this.authService.getUser()?.id;
     this.channelService.createChannel(this.channelName, this.channelGroupId, adminId).subscribe({

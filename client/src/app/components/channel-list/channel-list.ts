@@ -28,10 +28,12 @@ export class ChannelListComponent implements OnInit {
     private groupService: GroupService
   ) {}
 
+//初始化加载用户所在群组和频道列表
   ngOnInit() {
     this.loadChannels();
   }
 
+//加载频道数据
   loadChannels() {
     const userId = this.authService.getUser()?.id;
     if (!userId) {
@@ -54,6 +56,7 @@ export class ChannelListComponent implements OnInit {
     });
   }
 
+//获取群组下的频道  
   private fetchChannelsByGroup(groupId: string, userId: string) {
     if (!groupId) {
       this.channels = [];
@@ -65,12 +68,14 @@ export class ChannelListComponent implements OnInit {
     });
   }
 
+//切换群时更新频道 
   onGroupChange() {
     const userId = this.authService.getUser().id;
     this.fetchChannelsByGroup(this.selectedGroupId, userId);
     this.selectedChannelId = '';
   }
 
+//创建新频道  
   createChannel() {
     if (!this.newChannelName) return;
     const user = this.authService.getUser();
@@ -87,6 +92,7 @@ export class ChannelListComponent implements OnInit {
       });
   }
 
+//离开频道  
   leaveChannel(channelId: string) {
     const userId = this.authService.getUser().id;
     this.channelService.leaveChannel(channelId, userId).subscribe({
@@ -95,6 +101,7 @@ export class ChannelListComponent implements OnInit {
     });
   }
 
+//打开聊天页面  
   openChat(channelId: string) {
     this.selectedChannelId = channelId;
   }

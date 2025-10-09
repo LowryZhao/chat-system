@@ -21,10 +21,12 @@ export class LoginComponent {
 
   constructor(private authService: AuthService, private router: Router) {}
 
+//提交表单 
   onSubmit() {
     this.isRegister ? this.register() : this.login();
   }
 
+//登录逻辑  
   login() {
     this.error = null;
     this.loading = true;
@@ -46,6 +48,7 @@ export class LoginComponent {
     });
   }
 
+//注册逻辑  
   register() {
     this.error = null;
     this.loading = true;
@@ -68,6 +71,7 @@ export class LoginComponent {
     });
   }
 
+//切换登录和注册的模式  
   toggleMode() {
     this.isRegister = !this.isRegister;
     this.error = null;

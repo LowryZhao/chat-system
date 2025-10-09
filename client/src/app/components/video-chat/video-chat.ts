@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Peer, { MediaConnection } from 'peerjs';
 
+//允许测试环境模拟注入PeerJS
 let PeerFactory = Peer;
 export function setPeerFactory(factory: typeof Peer) {
   PeerFactory = factory;
@@ -28,6 +29,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
   statusMessage = 'Connecting...';
   statusClass = '';
 
+//连接PeerJS  
   async ngOnInit() {
     try {
       this.peer = new PeerFactory({
@@ -37,6 +39,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
         debug: 2
       });
 
+      //连接成功
       this.peer.on('open', (id) => {
         this.myPeerId = id;
         this.statusMessage = 'Connected to PeerJS Server';
@@ -44,12 +47,14 @@ export class VideoChatComponent implements OnInit, OnDestroy {
         console.log('My Peer ID:', id);
       });
 
+      //连接失败
       this.peer.on('error', (err) => {
         console.error('PeerJS Error:', err);
         this.statusMessage = `PeerJS connection failed (${err.type})`;
         this.statusClass = 'error';
       });
 
+      //接通
       this.peer.on('call', async (call) => {
         console.log('Incoming call from:', call.peer);
 
@@ -72,12 +77,14 @@ export class VideoChatComponent implements OnInit, OnDestroy {
     }
   }
 
+//call对面  
   async call() {
     if (!this.remotePeerId.trim()) {
       alert('Please enter a valid Peer ID first.');
       return;
     }
 
+    //摄像头
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       this.localStream = stream;
@@ -86,10 +93,12 @@ export class VideoChatComponent implements OnInit, OnDestroy {
         this.myVideo.nativeElement.srcObject = stream;
       }
 
+      //触发call
       this.callRef = this.peer.call(this.remotePeerId, this.localStream);
 
       await Promise.resolve();
 
+      //显示视频、更新状态
       this.callRef.on('stream', (remoteStream: MediaStream) => {
         if (this.remoteVideo?.nativeElement) {
           this.remoteVideo.nativeElement.srcObject = remoteStream;
@@ -108,6 +117,7 @@ export class VideoChatComponent implements OnInit, OnDestroy {
     }
   }
 
+//关闭时停止并删除
   ngOnDestroy() {
     try {
       if (this.callRef) this.callRef.close();

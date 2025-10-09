@@ -44,7 +44,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.scrollToBottom();
       })
     );
-
+//WebSocket消息订阅部分
     this.subscriptions.push(
       this.chat.onMessage().subscribe((m) => {
         this.messages.push(m);
@@ -52,6 +52,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       })
     );
 
+//用户加入时的通知
     this.subscriptions.push(
       this.chat.onUserJoined().subscribe(({ username }) => {
         this.messages.push({
@@ -62,6 +63,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       })
     );
 
+//用户离开时的通知
     this.subscriptions.push(
       this.chat.onUserLeft().subscribe(({ username }) => {
         this.messages.push({
@@ -72,6 +74,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       })
     );
 
+//系统提示的消息
     this.subscriptions.push(
       this.chat.onSystem().subscribe(({ message }) => {
         this.messages.push({ system: true, message });
@@ -80,10 +83,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     );
   }
 
+//保持聊天框在底部
   ngAfterViewChecked() {
     this.scrollToBottom();
   }
 
+//当用户离开时清理能看到的消息
   ngOnDestroy() {
     if (this.me?.username && this.channelId) {
       this.chat.leaveChannel(this.channelId, this.me.username);
@@ -91,6 +96,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.subscriptions.forEach((s) => s.unsubscribe());
   }
 
+//信息发送功能（图片+消息）
   send() {
     if (!this.text.trim() && !this.imageFile) return;
 
@@ -118,7 +124,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
           error: () => alert('Image upload failed')
         });
     }
-
+    
     if (this.text.trim()) {
       this.chat.sendMessage(
         this.channelId,
@@ -130,10 +136,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
+//选择图片  
   pickImage(event: any) {
     this.imageFile = event.target.files?.[0] ?? null;
   }
 
+//保持在底部 
   private scrollToBottom() {
     try {
       setTimeout(() => {
@@ -145,6 +153,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     } catch {}
   }
 
+//到视频聊天功能  
   goToVideoChat() {
   this.router.navigate(['/video']);
 

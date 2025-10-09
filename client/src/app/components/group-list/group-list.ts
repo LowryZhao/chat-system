@@ -24,11 +24,13 @@ export class GroupListComponent implements OnInit {
   ngOnInit() {
     this.loadData();
   }
-  
+
+//加载群组数据  
   private loadData() {
     const user = this.authService.getUser?.();
     const userId = user?.id;
 
+    //验证用户信息
     if (!userId) {
       console.warn('No user ID found in authService');
       this.myGroups = [];
@@ -36,11 +38,13 @@ export class GroupListComponent implements OnInit {
       return;
     }
 
+    //加载所在群组
     this.groupService.getUserGroups(userId).subscribe({
       next: (gs) => (this.myGroups = gs ?? []),
       error: () => (this.myGroups = [])
     });
 
+    //admin显示所有群组
     if (this.authService.hasRole?.('group_admin') || this.authService.hasRole?.('super_admin')) {
       this.groupService.getAllGroups().subscribe({
         next: (gs) => (this.allGroups = gs ?? []),
@@ -51,6 +55,7 @@ export class GroupListComponent implements OnInit {
     }
   }
 
+//添加用户到群组  
   addUserToGroup(groupId: string, userId: string) {
     const adminId = this.authService.getUser?.()?.id;
     if (!adminId) return;
@@ -65,6 +70,7 @@ export class GroupListComponent implements OnInit {
     });
   }
 
+//从群组中移除用户  
   removeUserFromGroup(groupId: string, userId: string) {
     const adminId = this.authService.getUser?.()?.id;
     if (!adminId) return;
@@ -79,6 +85,7 @@ export class GroupListComponent implements OnInit {
     });
   }
 
+//用户是否是群组成员  
   isMember(group: Group): boolean {
     if (!group || !group.members) return false;
     const uid = this.authService.getUser?.()?.id;

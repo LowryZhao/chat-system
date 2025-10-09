@@ -1,14 +1,17 @@
 const { connectDB } = require('../db');
 
+//是否是superadmin
 async function isSuperAdmin(db, userId) {
   const user = await db.collection('users').findOne({ id: userId });
   return user?.roles?.includes('super_admin');
 }
 
+//是否是groupadmin
 async function isGroupAdmin(db, userId, group) {
   return group.admins.includes(userId) || await isSuperAdmin(db, userId);
 }
 
+//创建
 exports.createChannel = async (req, res) => {
   try {
     const { name, groupId, adminId } = req.body;
@@ -43,6 +46,7 @@ exports.createChannel = async (req, res) => {
   }
 };
 
+//添加用户到channel
 exports.addUserToChannel = async (req, res) => {
   try {
     const { channelId } = req.params;
@@ -71,6 +75,7 @@ exports.addUserToChannel = async (req, res) => {
   }
 };
 
+//移除chennel成员
 exports.removeUserFromChannel = async (req, res) => {
   try {
     const { channelId } = req.params;
@@ -98,6 +103,7 @@ exports.removeUserFromChannel = async (req, res) => {
   }
 };
 
+//查询用户所在channek
 exports.getGroupChannelsForUser = async (req, res) => {
   try {
     const { groupId } = req.params;
@@ -116,6 +122,7 @@ exports.getGroupChannelsForUser = async (req, res) => {
   }
 };
 
+//用户离开channel
 exports.leaveChannel = async (req, res) => {
   try {
     const { channelId, userId } = req.body;
@@ -132,6 +139,7 @@ exports.leaveChannel = async (req, res) => {
   }
 };
 
+//删除channel
 exports.deleteChannel = async (req, res) => {
   try {
     const { channelId } = req.params;
